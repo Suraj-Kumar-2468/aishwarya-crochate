@@ -1,0 +1,31 @@
+{
+  "businessName": "Aishwarya Crochet's",
+  "tagline": "Handmade & made with love",
+  "announcementText": "✿ Free shipping on orders above ₹999 — DM to customize your order ✿",
+  "heroTitle": "Cozy crochet",
+  "heroTagline": "stitched just for you",
+  "heroSubtitle": "Placeholder tagline — browse the catalog below and message us on WhatsApp to order any piece.",
+  "heroButtonText": "Browse the Shop",
+  "heroImage": "https://placehold.co/1200x800/ffe4ec/c73f72?text=Hero+Banner",
+  "whatsappNumber": "919611662744",
+  "whatsappGeneralMessage": "Hey! I am interested in your crochet products.",
+  "footerText": "Handmade with love. Message us on WhatsApp for orders.",
+  "shopSectionTitle": "Shop the Catalog",
+  "bestsellersTitle": "Our Bestsellers",
+  "testimonialsTitle": "What our customers say",
+  "instagramTitle": "Follow along on Instagram",
+  "instagramHandle": "@aishwarya.crochets",
+  "instagramUrl": "https://www.instagram.com/",
+  "facebookUrl": "https://www.facebook.com/",
+  "trustMarkers": [
+    { "icon": "🧶", "text": "100% Handmade" },
+    { "icon": "💬", "text": "Order via WhatsApp" },
+    { "icon": "🚚", "text": "Pan-India Shipping" },
+    { "icon": "🎨", "text": "Custom Colors Available" }
+  ],
+  "testimonials": [
+    { "name": "Placeholder Customer 1", "text": "Placeholder review — absolutely loved the quality and detail!", "rating": 5 },
+    { "name": "Placeholder Customer 2", "text": "Placeholder review — fast WhatsApp ordering, arrived beautifully packed.", "rating": 5 },
+    { "name": "Placeholder Customer 3", "text": "Placeholder review — best handmade gift I have bought this year.", "rating": 5 }
+  ]
+}

@@ -1,0 +1,42 @@
+import { Link } from "react-router-dom";
+import { useSiteData } from "../context/SiteDataContext.jsx";
+import { whatsappLink } from "../lib/whatsapp.js";
+
+export default function Header() {
+  const { content, categories } = useSiteData();
+  if (!content) return null;
+
+  const shopCategories = categories.filter((c) => c !== "All");
+
+  return (
+    <header className="site-header">
+      <div className="header-inner">
+        <Link to="/" className="logo">{content.businessName}</Link>
+
+        <nav className="main-nav">
+          <Link to="/">Home</Link>
+          <div className="nav-dropdown">
+            <span>Shop ▾</span>
+            <div className="nav-dropdown-menu">
+              <Link to="/">All Products</Link>
+              {shopCategories.map((cat) => (
+                <Link key={cat} to={`/?category=${encodeURIComponent(cat)}`}>{cat}</Link>
+              ))}
+            </div>
+          </div>
+          <a href="#testimonials">Reviews</a>
+          <a href="#instagram">Instagram</a>
+        </nav>
+
+        <a
+          className="whatsapp-pill"
+          href={whatsappLink(content.whatsappNumber, content.whatsappGeneralMessage)}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Chat on WhatsApp
+        </a>
+      </div>
+    </header>
+  );
+}
