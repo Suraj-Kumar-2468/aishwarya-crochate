@@ -78,8 +78,11 @@ export async function uploadImage(file) {
     const data = await res.json().catch(() => ({}));
     throw new Error(data.error || `Upload failed: ${res.status}`);
   }
-  const data = await res.json();
-  return data.url;
+  return res.json();
+}
+
+export async function deleteImage(publicId) {
+  return request("/api/upload", { method: "DELETE", body: { publicId }, auth: true });
 }
 
 export async function fetchContent() {

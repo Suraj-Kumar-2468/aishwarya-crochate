@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { createProduct, updateProduct, deleteProduct, uploadImage } from "../../api.js";
+import { createProduct, updateProduct, deleteProduct, uploadImage, deleteImage } from "../../api.js";
 import { useSiteData } from "../../context/SiteDataContext.jsx";
 
-const EMPTY_PRODUCT = { name: "", category: "", price: "", mrp: "", tag: "", image: "", description: "" };
+const EMPTY_PRODUCT = { name: "", category: "", price: "", mrp: "", tag: "", image: "", imagePublicId: "", description: "" };
 
 export default function ProductManager() {
   const { products, categories, refetch } = useSiteData();
@@ -18,13 +18,25 @@ export default function ProductManager() {
     setUploading(true);
     setMessage("");
     try {
-      const url = await uploadImage(file);
-      setField("image", url);
+      const { url, publicId } = await uploadImage(file);
+      setForm((f) => ({ ...f, image: url, imagePublicId: publicId }));
     } catch (err) {
       setMessage(err.message || "Image upload failed");
     } finally {
       setUploading(false);
+      e.target.value = "";
     }
+  }
+
+  async function handleRemoveImage() {
+    if (form.imagePublicId) {
+      try {
+        await deleteImage(form.imagePublicId);
+      } catch {
+        // best effort — still clear from the form
+      }
+    }
+    setForm((f) => ({ ...f, image: "", imagePublicId: "" }));
   }
 
   function setField(key, value) {
@@ -40,6 +52,7 @@ export default function ProductManager() {
       mrp: product.mrp || "",
       tag: product.tag || "",
       image: product.image,
+      imagePublicId: "",
       description: product.description || "",
     });
   }
@@ -65,7 +78,7 @@ export default function ProductManager() {
       tag: form.tag || null,
       image: form.image,
       description: form.description,
-    };
+    }; // imagePublicId is form-local only, never sent to the API
     try {
       if (editingId) {
         await updateProduct(editingId, payload);
@@ -131,7 +144,12 @@ export default function ProductManager() {
             <input type="file" accept="image/*" onChange={handleImageFile} disabled={uploading} />
             {uploading && <span className="admin-upload-status">Uploading…</span>}
             {form.image && (
-              <img src={form.image} alt="Preview" className="admin-image-preview" />
+              <div className="admin-image-preview-wrap">
+                <img src={form.image} alt="Preview" className="admin-image-preview" />
+                <button type="button" className="admin-image-remove" onClick={handleRemoveImage}>
+                  Remove
+                </button>
+              </div>
             )}
           </label>
         </div>

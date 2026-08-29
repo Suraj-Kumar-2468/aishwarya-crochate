@@ -13,10 +13,21 @@ router.post("/", requireAdmin, upload.single("image"), async (req, res) => {
     { folder: "aishwarya-crochet/products" },
     (err, result) => {
       if (err) return res.status(500).json({ error: "Upload failed" });
-      res.json({ url: result.secure_url });
+      res.json({ url: result.secure_url, publicId: result.public_id });
     }
   );
   stream.end(req.file.buffer);
+});
+
+router.delete("/", requireAdmin, async (req, res) => {
+  const { publicId } = req.body;
+  if (!publicId) return res.status(400).json({ error: "publicId required" });
+  try {
+    await cloudinary.uploader.destroy(publicId);
+    res.json({ ok: true });
+  } catch {
+    res.status(500).json({ error: "Delete failed" });
+  }
 });
 
 export default router;
