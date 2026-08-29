@@ -27,7 +27,7 @@ export default function SectionManager() {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    if (content) setSections([...content.sections].sort((a, b) => a.order - b.order));
+    if (content) setSections([...(content.sections || [])].sort((a, b) => a.order - b.order));
   }, [content]);
 
   if (!sections) return <p>Loading…</p>;

@@ -10,7 +10,7 @@ export default function TagManager() {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    if (content) setTags([...content.tags]);
+    if (content) setTags([...(content.tags || [])]);
   }, [content]);
 
   if (!tags) return <p>Loading…</p>;
