@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createProduct, updateProduct, deleteProduct } from "../../api.js";
+import { createProduct, updateProduct, deleteProduct, uploadImage } from "../../api.js";
 import { useSiteData } from "../../context/SiteDataContext.jsx";
 
 const EMPTY_PRODUCT = { name: "", category: "", price: "", mrp: "", tag: "", image: "", description: "" };
@@ -9,7 +9,23 @@ export default function ProductManager() {
   const [form, setForm] = useState(EMPTY_PRODUCT);
   const [editingId, setEditingId] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState("");
+
+  async function handleImageFile(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setMessage("");
+    try {
+      const url = await uploadImage(file);
+      setField("image", url);
+    } catch (err) {
+      setMessage(err.message || "Image upload failed");
+    } finally {
+      setUploading(false);
+    }
+  }
 
   function setField(key, value) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -35,6 +51,10 @@ export default function ProductManager() {
 
   async function handleSubmit(e) {
     e.preventDefault();
+    if (!form.image) {
+      setMessage("Please upload a product image first.");
+      return;
+    }
     setSaving(true);
     setMessage("");
     const payload = {
@@ -107,8 +127,12 @@ export default function ProductManager() {
             <input value={form.tag} onChange={(e) => setField("tag", e.target.value)} />
           </label>
           <label className="admin-field">
-            Image URL
-            <input value={form.image} onChange={(e) => setField("image", e.target.value)} required />
+            Product Image
+            <input type="file" accept="image/*" onChange={handleImageFile} disabled={uploading} />
+            {uploading && <span className="admin-upload-status">Uploading…</span>}
+            {form.image && (
+              <img src={form.image} alt="Preview" className="admin-image-preview" />
+            )}
           </label>
         </div>
         <label className="admin-field admin-field-full">

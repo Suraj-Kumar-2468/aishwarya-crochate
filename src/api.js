@@ -65,6 +65,23 @@ export async function deleteProduct(id) {
   return request(`/api/products/${id}`, { method: "DELETE", auth: true });
 }
 
+export async function uploadImage(file) {
+  const formData = new FormData();
+  formData.append("image", file);
+  const token = getToken();
+  const res = await fetch(`${API_BASE}/api/upload`, {
+    method: "POST",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    body: formData,
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || `Upload failed: ${res.status}`);
+  }
+  const data = await res.json();
+  return data.url;
+}
+
 export async function fetchContent() {
   return request("/api/content");
 }

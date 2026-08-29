@@ -7,7 +7,7 @@
       "category": "Bags",
       "price": 999,
       "tag": "Bestseller",
-      "image": "/products/waffle-shoulder-handbag.jpg",
+      "image": "https://res.cloudinary.com/vmkkbidh/image/upload/v1787994852/aishwarya-crochet/products/ljc4zdqxsqno9lzbzi4j.jpg",
       "description": "Hand-crocheted waffle-stitch shoulder bag with sturdy handle. Made to order in your choice of color."
     },
     {
@@ -16,7 +16,7 @@
       "category": "Wearables",
       "price": 599,
       "tag": "Bestseller",
-      "image": "/products/mikasa-scarf.jpg",
+      "image": "https://res.cloudinary.com/vmkkbidh/image/upload/v1787994848/aishwarya-crochet/products/pz1girrujs0vgabrlnod.jpg",
       "description": "Cozy ribbed scarf with fringe tassels and bow accents, hand-knotted for a soft finish."
     },
     {
@@ -25,7 +25,7 @@
       "category": "Accessories",
       "price": 149,
       "tag": "New",
-      "image": "/products/sunflower-bag-charm.jpg",
+      "image": "https://res.cloudinary.com/vmkkbidh/image/upload/v1787994851/aishwarya-crochet/products/oljqkxckezcnco9sydqb.jpg",
       "description": "Cheerful crochet sunflower keyring, perfect for clipping onto bags and backpacks."
     },
     {
@@ -34,7 +34,7 @@
       "category": "Accessories",
       "price": 129,
       "tag": null,
-      "image": "/products/strawberry-keychain.jpg",
+      "image": "https://res.cloudinary.com/vmkkbidh/image/upload/v1787994850/aishwarya-crochet/products/udwuicngu3phqzybbfb5.jpg",
       "description": "Sweet handmade strawberry keychain with leafy top detail."
     },
     {
@@ -43,7 +43,7 @@
       "category": "Accessories",
       "price": 99,
       "tag": "Bestseller",
-      "image": "/products/bow-keychain.jpg",
+      "image": "https://res.cloudinary.com/vmkkbidh/image/upload/v1787994845/aishwarya-crochet/products/d4ufjj53qxkeiiuxy82y.jpg",
       "description": "Dainty crochet bow keychain, soft and lightweight for everyday carry."
     },
     {
@@ -52,7 +52,7 @@
       "category": "Accessories",
       "price": 149,
       "tag": null,
-      "image": "/products/rcb-keychain.jpg",
+      "image": "https://res.cloudinary.com/vmkkbidh/image/upload/v1787994850/aishwarya-crochet/products/pkmt9ifzanaq0dcqdrny.jpg",
       "description": "Fan-favorite team-inspired crochet keychain, handmade in team colors."
     },
     {
@@ -61,7 +61,7 @@
       "category": "Accessories",
       "price": 199,
       "tag": "Bestseller",
-      "image": "/products/floral-scrunchie-set.jpg",
+      "image": "https://res.cloudinary.com/vmkkbidh/image/upload/v1787994846/aishwarya-crochet/products/niweqlpcnhkvvjfbn3m6.jpg",
       "description": "Set of handmade floral scrunchies, gentle on hair with a soft crochet finish."
     },
     {
@@ -70,7 +70,7 @@
       "category": "Accessories",
       "price": 89,
       "tag": null,
-      "image": "/products/daisy-hairclip.jpg",
+      "image": "https://res.cloudinary.com/vmkkbidh/image/upload/v1787994846/aishwarya-crochet/products/vrlma8clmxmhnx9knyif.jpg",
       "description": "Handmade daisy-shaped hairclip, a sweet everyday accessory."
     },
     {
@@ -79,7 +79,7 @@
       "category": "Accessories",
       "price": 99,
       "tag": "New",
-      "image": "/products/pookie-bow-hair-clip.jpg",
+      "image": "https://res.cloudinary.com/vmkkbidh/image/upload/v1787994849/aishwarya-crochet/products/jc1o3dq0p3onqos1rzei.jpg",
       "description": "Trendy crochet bow hairclip in soft pastel tones."
     },
     {
@@ -88,7 +88,7 @@
       "category": "Accessories",
       "price": 119,
       "tag": null,
-      "image": "/products/lotus-bun-stick.jpg",
+      "image": "https://res.cloudinary.com/vmkkbidh/image/upload/v1787994847/aishwarya-crochet/products/xufkpcsala7oq9kwegdo.jpg",
       "description": "Handcrafted lotus-flower hair stick for buns and updos."
     }
   ]
