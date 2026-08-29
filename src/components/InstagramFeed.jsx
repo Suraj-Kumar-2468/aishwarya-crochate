@@ -1,6 +1,6 @@
 import { useSiteData } from "../context/SiteDataContext.jsx";
 
-export default function InstagramFeed() {
+export default function InstagramFeed({ title }) {
   const { content, products } = useSiteData();
   if (!content) return null;
 
@@ -8,7 +8,7 @@ export default function InstagramFeed() {
 
   return (
     <section className="instagram-section">
-      <h2 className="section-title">{content.instagramTitle}</h2>
+      <h2 className="section-title">{title ?? content.instagramTitle}</h2>
       <p className="instagram-handle">
         <a href={content.instagramUrl} target="_blank" rel="noopener noreferrer">
           {content.instagramHandle}

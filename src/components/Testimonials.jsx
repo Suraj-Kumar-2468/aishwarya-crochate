@@ -1,7 +1,7 @@
 import { useSiteData } from "../context/SiteDataContext.jsx";
 import useReveal from "../hooks/useReveal.js";
 
-export default function Testimonials() {
+export default function Testimonials({ title }) {
   const [ref, visible] = useReveal();
   const { content } = useSiteData();
   if (!content) return null;
@@ -9,7 +9,7 @@ export default function Testimonials() {
   return (
     <section className="testimonials-section">
       <h2 ref={ref} className={"section-title reveal" + (visible ? " visible" : "")}>
-        {content.testimonialsTitle}
+        {title ?? content.testimonialsTitle}
       </h2>
       <div className="testimonials-grid">
         {content.testimonials.map((t) => (

@@ -5,7 +5,8 @@ import { useSiteData } from "../../context/SiteDataContext.jsx";
 const EMPTY_PRODUCT = { name: "", category: "", price: "", mrp: "", tag: "", image: "", imagePublicId: "", description: "" };
 
 export default function ProductManager() {
-  const { products, categories, refetch } = useSiteData();
+  const { products, categories, content, refetch } = useSiteData();
+  const tags = content?.tags || [];
   const [form, setForm] = useState(EMPTY_PRODUCT);
   const [editingId, setEditingId] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -136,8 +137,13 @@ export default function ProductManager() {
             <input type="number" value={form.mrp} onChange={(e) => setField("mrp", e.target.value)} />
           </label>
           <label className="admin-field">
-            Tag (e.g. Bestseller)
-            <input value={form.tag} onChange={(e) => setField("tag", e.target.value)} />
+            Tag
+            <select value={form.tag} onChange={(e) => setField("tag", e.target.value)}>
+              <option value="">— none —</option>
+              {tags.map((t) => (
+                <option key={t} value={t}>{t}</option>
+              ))}
+            </select>
           </label>
           <label className="admin-field">
             Product Image

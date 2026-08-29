@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { clearToken } from "../../api.js";
 import ContentEditor from "./ContentEditor.jsx";
 import ProductManager from "./ProductManager.jsx";
+import SectionManager from "./SectionManager.jsx";
+import TagManager from "./TagManager.jsx";
 
 export default function AdminDashboard() {
   const [tab, setTab] = useState("products");
@@ -35,9 +37,26 @@ export default function AdminDashboard() {
         >
           Site Content
         </button>
+        <button
+          type="button"
+          className={tab === "sections" ? "admin-tab active" : "admin-tab"}
+          onClick={() => setTab("sections")}
+        >
+          Sections
+        </button>
+        <button
+          type="button"
+          className={tab === "tags" ? "admin-tab active" : "admin-tab"}
+          onClick={() => setTab("tags")}
+        >
+          Tags
+        </button>
       </div>
 
-      {tab === "products" ? <ProductManager /> : <ContentEditor />}
+      {tab === "products" && <ProductManager />}
+      {tab === "content" && <ContentEditor />}
+      {tab === "sections" && <SectionManager />}
+      {tab === "tags" && <TagManager />}
     </main>
   );
 }

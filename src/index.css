@@ -816,7 +816,8 @@ a { color: inherit; text-decoration: none; }
 }
 
 .admin-field input,
-.admin-field textarea {
+.admin-field textarea,
+.admin-field select {
   padding: 9px 11px;
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -946,4 +947,203 @@ a { color: inherit; text-decoration: none; }
   padding: 5px 10px;
   cursor: pointer;
   font-size: 0.8rem;
+}
+
+.admin-hint {
+  color: var(--text-soft);
+  font-size: 0.85rem;
+  margin: 0 0 16px;
+}
+
+.admin-switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+.admin-switch input {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  cursor: pointer;
+}
+
+.admin-switch-track {
+  position: absolute;
+  inset: 0;
+  background: var(--border);
+  border-radius: 999px;
+  transition: background 0.15s ease;
+}
+
+.admin-switch-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.15s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+.admin-switch input:checked ~ .admin-switch-track {
+  background: var(--accent);
+}
+
+.admin-switch input:checked ~ .admin-switch-track .admin-switch-thumb {
+  transform: translateX(18px);
+}
+
+.admin-section-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.admin-section-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 16px;
+  background: var(--bg-card);
+}
+
+.admin-section-row-off {
+  opacity: 0.55;
+}
+
+.admin-section-body {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.admin-section-type {
+  font-weight: 600;
+  font-size: 0.9rem;
+  min-width: 170px;
+}
+
+.admin-section-title-input {
+  flex: 1;
+  min-width: 160px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: var(--font-body);
+}
+
+.admin-section-body select {
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: var(--font-body);
+}
+
+.admin-section-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.admin-section-actions button {
+  border: 1px solid var(--border);
+  background: none;
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.admin-section-add {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.admin-section-add select {
+  padding: 9px 11px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: var(--font-body);
+}
+
+.admin-section-add button {
+  border: 1px solid var(--border);
+  background: none;
+  border-radius: 8px;
+  padding: 9px 16px;
+  cursor: pointer;
+  font-family: var(--font-body);
+}
+
+.admin-tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.admin-tag-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 8px 6px 14px;
+  background: var(--bg-card);
+  font-size: 0.85rem;
+}
+
+.admin-tag-usage {
+  color: var(--text-soft);
+  font-size: 0.75rem;
+}
+
+.admin-tag-chip button {
+  border: none;
+  background: var(--border);
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  line-height: 1;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.admin-tag-add {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.admin-tag-add input {
+  flex: 1;
+  max-width: 280px;
+  padding: 9px 11px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: var(--font-body);
+}
+
+.admin-tag-add button {
+  border: 1px solid var(--border);
+  background: none;
+  border-radius: 8px;
+  padding: 9px 16px;
+  cursor: pointer;
+  font-family: var(--font-body);
 }

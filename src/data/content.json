@@ -27,5 +27,14 @@
     { "name": "Placeholder Customer 1", "text": "Placeholder review — absolutely loved the quality and detail!", "rating": 5 },
     { "name": "Placeholder Customer 2", "text": "Placeholder review — fast WhatsApp ordering, arrived beautifully packed.", "rating": 5 },
     { "name": "Placeholder Customer 3", "text": "Placeholder review — best handmade gift I have bought this year.", "rating": 5 }
+  ],
+  "tags": ["Bestseller"],
+  "sections": [
+    { "id": "hero", "type": "hero", "enabled": true, "order": 0, "title": "", "settings": {} },
+    { "id": "trust-badges", "type": "trustBadges", "enabled": true, "order": 1, "title": "", "settings": {} },
+    { "id": "bestsellers", "type": "collection", "enabled": true, "order": 2, "title": "Our Bestsellers", "settings": { "tag": "Bestseller" } },
+    { "id": "shop", "type": "shop", "enabled": true, "order": 3, "title": "Shop the Catalog", "settings": {} },
+    { "id": "testimonials", "type": "testimonials", "enabled": true, "order": 4, "title": "What our customers say", "settings": {} },
+    { "id": "instagram", "type": "instagram", "enabled": true, "order": 5, "title": "Follow along on Instagram", "settings": {} }
   ]
 }

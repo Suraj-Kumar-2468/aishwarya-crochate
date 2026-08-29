@@ -14,10 +14,6 @@ const TEXT_FIELDS = [
   ["whatsappNumber", "WhatsApp Number"],
   ["whatsappGeneralMessage", "WhatsApp General Message"],
   ["footerText", "Footer Text"],
-  ["shopSectionTitle", "Shop Section Title"],
-  ["bestsellersTitle", "Bestsellers Title"],
-  ["testimonialsTitle", "Testimonials Title"],
-  ["instagramTitle", "Instagram Section Title"],
   ["instagramHandle", "Instagram Handle"],
   ["instagramUrl", "Instagram URL"],
   ["facebookUrl", "Facebook URL"],
@@ -98,6 +94,7 @@ export default function ContentEditor() {
 
   return (
     <form className="admin-content-form" onSubmit={handleSubmit}>
+      <p className="admin-hint">Section titles and on/off toggles live under the Sections tab.</p>
       <div className="admin-field-grid">
         {TEXT_FIELDS.map(([key, label]) => (
           <label key={key} className="admin-field">
