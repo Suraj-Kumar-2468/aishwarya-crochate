@@ -2,7 +2,7 @@ import { useState } from "react";
 import { createProduct, updateProduct, deleteProduct, uploadImage, deleteImage } from "../../api.js";
 import { useSiteData } from "../../context/SiteDataContext.jsx";
 
-const EMPTY_PRODUCT = { name: "", category: "", price: "", mrp: "", tag: "", image: "", imagePublicId: "", description: "" };
+const EMPTY_PRODUCT = { name: "", category: "", price: "", mrp: "", tag: "", images: [], description: "" };
 
 export default function ProductManager() {
   const { products, categories, content, refetch } = useSiteData();
@@ -13,14 +13,16 @@ export default function ProductManager() {
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState("");
 
-  async function handleImageFile(e) {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  async function handleImageFiles(e) {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
     setUploading(true);
     setMessage("");
     try {
-      const { url, publicId } = await uploadImage(file);
-      setForm((f) => ({ ...f, image: url, imagePublicId: publicId }));
+      for (const file of files) {
+        const { url, publicId } = await uploadImage(file);
+        setForm((f) => ({ ...f, images: [...f.images, { url, publicId }] }));
+      }
     } catch (err) {
       setMessage(err.message || "Image upload failed");
     } finally {
@@ -29,15 +31,26 @@ export default function ProductManager() {
     }
   }
 
-  async function handleRemoveImage() {
-    if (form.imagePublicId) {
+  async function handleRemoveImage(index) {
+    const img = form.images[index];
+    if (img.publicId) {
       try {
-        await deleteImage(form.imagePublicId);
+        await deleteImage(img.publicId);
       } catch {
         // best effort — still clear from the form
       }
     }
-    setForm((f) => ({ ...f, image: "", imagePublicId: "" }));
+    setForm((f) => ({ ...f, images: f.images.filter((_, i) => i !== index) }));
+  }
+
+  function moveImage(index, dir) {
+    setForm((f) => {
+      const images = [...f.images];
+      const target = index + dir;
+      if (target < 0 || target >= images.length) return f;
+      [images[index], images[target]] = [images[target], images[index]];
+      return { ...f, images };
+    });
   }
 
   function setField(key, value) {
@@ -52,8 +65,7 @@ export default function ProductManager() {
       price: product.price,
       mrp: product.mrp || "",
       tag: product.tag || "",
-      image: product.image,
-      imagePublicId: "",
+      images: (product.images || []).map((img) => ({ ...img })),
       description: product.description || "",
     });
   }
@@ -65,8 +77,8 @@ export default function ProductManager() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (!form.image) {
-      setMessage("Please upload a product image first.");
+    if (!form.images.length) {
+      setMessage("Please upload at least one product image first.");
       return;
     }
     setSaving(true);
@@ -77,9 +89,9 @@ export default function ProductManager() {
       price: Number(form.price),
       mrp: form.mrp ? Number(form.mrp) : undefined,
       tag: form.tag || null,
-      image: form.image,
+      images: form.images,
       description: form.description,
-    }; // imagePublicId is form-local only, never sent to the API
+    };
     try {
       if (editingId) {
         await updateProduct(editingId, payload);
@@ -145,16 +157,23 @@ export default function ProductManager() {
               ))}
             </select>
           </label>
-          <label className="admin-field">
-            Product Image
-            <input type="file" accept="image/*" onChange={handleImageFile} disabled={uploading} />
+          <label className="admin-field admin-field-full">
+            Product Images (first one is the cover)
+            <input type="file" accept="image/*" multiple onChange={handleImageFiles} disabled={uploading} />
             {uploading && <span className="admin-upload-status">Uploading…</span>}
-            {form.image && (
-              <div className="admin-image-preview-wrap">
-                <img src={form.image} alt="Preview" className="admin-image-preview" />
-                <button type="button" className="admin-image-remove" onClick={handleRemoveImage}>
-                  Remove
-                </button>
+            {form.images.length > 0 && (
+              <div className="admin-image-grid">
+                {form.images.map((img, i) => (
+                  <div key={img.url + i} className="admin-image-grid-item">
+                    <img src={img.url} alt={`Product ${i + 1}`} className="admin-image-preview" />
+                    {i === 0 && <span className="admin-image-cover-badge">Cover</span>}
+                    <div className="admin-image-grid-actions">
+                      <button type="button" onClick={() => moveImage(i, -1)} disabled={i === 0}>↑</button>
+                      <button type="button" onClick={() => moveImage(i, 1)} disabled={i === form.images.length - 1}>↓</button>
+                      <button type="button" className="admin-image-remove" onClick={() => handleRemoveImage(i)}>Remove</button>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </label>
@@ -192,7 +211,7 @@ export default function ProductManager() {
           <tbody>
             {products.map((p) => (
               <tr key={p.id}>
-                <td><img src={p.image} alt={p.name} className="admin-product-thumb" /></td>
+                <td><img src={p.images?.[0]?.url} alt={p.name} className="admin-product-thumb" /></td>
                 <td>{p.name}</td>
                 <td>{p.category}</td>
                 <td>₹{p.price}</td>

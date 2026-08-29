@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { updateContent } from "../../api.js";
+import { updateContent, uploadImage } from "../../api.js";
 import { useSiteData } from "../../context/SiteDataContext.jsx";
 
 const TEXT_FIELDS = [
@@ -70,11 +70,24 @@ export default function ContentEditor() {
   }
 
   function addTestimonial() {
-    setField("testimonials", [...form.testimonials, { name: "", text: "", rating: 5 }]);
+    setField("testimonials", [...form.testimonials, { name: "", text: "", rating: 5, image: "" }]);
   }
 
   function removeTestimonial(index) {
     setField("testimonials", form.testimonials.filter((_, i) => i !== index));
+  }
+
+  async function handleTestimonialImage(index, e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const { url } = await uploadImage(file, "testimonials");
+      setTestimonial(index, "image", url);
+    } catch (err) {
+      setMessage(err.message || "Image upload failed");
+    } finally {
+      e.target.value = "";
+    }
   }
 
   async function handleSubmit(e) {
@@ -130,18 +143,24 @@ export default function ContentEditor() {
       <fieldset className="admin-fieldset">
         <legend>Testimonials</legend>
         {form.testimonials.map((t, i) => (
-          <div key={i} className="admin-list-row admin-list-row-testimonial">
-            <input placeholder="Name" value={t.name} onChange={(e) => setTestimonial(i, "name", e.target.value)} />
-            <input placeholder="Text" value={t.text} onChange={(e) => setTestimonial(i, "text", e.target.value)} />
-            <input
-              placeholder="Rating"
-              type="number"
-              min="1"
-              max="5"
-              value={t.rating}
-              onChange={(e) => setTestimonial(i, "rating", e.target.value)}
-            />
-            <button type="button" onClick={() => removeTestimonial(i)}>Remove</button>
+          <div key={i} className="admin-testimonial-row">
+            <div className="admin-list-row admin-list-row-testimonial">
+              <input placeholder="Name" value={t.name} onChange={(e) => setTestimonial(i, "name", e.target.value)} />
+              <input placeholder="Text" value={t.text} onChange={(e) => setTestimonial(i, "text", e.target.value)} />
+              <input
+                placeholder="Rating"
+                type="number"
+                min="1"
+                max="5"
+                value={t.rating}
+                onChange={(e) => setTestimonial(i, "rating", e.target.value)}
+              />
+              <button type="button" onClick={() => removeTestimonial(i)}>Remove</button>
+            </div>
+            <div className="admin-testimonial-photo">
+              {t.image && <img src={t.image} alt={t.name} className="admin-image-preview admin-image-preview-round" />}
+              <input type="file" accept="image/*" onChange={(e) => handleTestimonialImage(i, e)} />
+            </div>
           </div>
         ))}
         <button type="button" onClick={addTestimonial}>+ Add Testimonial</button>

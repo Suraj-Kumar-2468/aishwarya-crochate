@@ -6,7 +6,7 @@ const trustMarkerSchema = new mongoose.Schema(
 );
 
 const testimonialSchema = new mongoose.Schema(
-  { name: String, text: String, rating: Number },
+  { name: String, text: String, rating: Number, image: { type: String, default: "" } },
   { _id: false }
 );
 

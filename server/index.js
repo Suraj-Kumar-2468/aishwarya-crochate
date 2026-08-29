@@ -42,6 +42,12 @@ app.use("/api/upload", uploadRoutes);
 
 app.get("/api/health", (req, res) => res.json({ ok: true }));
 
+app.use((err, req, res, next) => {
+  console.error(err);
+  if (err.name === "ValidationError") return res.status(400).json({ error: err.message });
+  res.status(500).json({ error: "Internal server error" });
+});
+
 const port = process.env.PORT || 4000;
 
 connectDb()

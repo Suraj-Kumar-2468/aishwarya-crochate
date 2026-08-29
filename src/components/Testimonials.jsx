@@ -14,6 +14,7 @@ export default function Testimonials({ title }) {
       <div className="testimonials-grid">
         {content.testimonials.map((t) => (
           <div key={t.name} className="testimonial-card">
+            {t.image && <img src={t.image} alt={t.name} className="testimonial-avatar" />}
             <div className="testimonial-stars">{"★".repeat(t.rating)}</div>
             <p className="testimonial-text">"{t.text}"</p>
             <p className="testimonial-name">— {t.name}</p>

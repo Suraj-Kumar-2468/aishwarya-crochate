@@ -23,7 +23,7 @@ export default function InstagramFeed({ title }) {
             rel="noopener noreferrer"
             className="instagram-tile"
           >
-            <img src={p.image} alt={p.name} loading="lazy" />
+            <img src={p.images?.[0]?.url} alt={p.name} loading="lazy" />
           </a>
         ))}
       </div>

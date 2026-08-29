@@ -65,9 +65,10 @@ export async function deleteProduct(id) {
   return request(`/api/products/${id}`, { method: "DELETE", auth: true });
 }
 
-export async function uploadImage(file) {
+export async function uploadImage(file, folder) {
   const formData = new FormData();
   formData.append("image", file);
+  if (folder) formData.append("folder", folder);
   const token = getToken();
   const res = await fetch(`${API_BASE}/api/upload`, {
     method: "POST",
