@@ -170,6 +170,7 @@ export default function ProductManager() {
 
       <div className="admin-product-list">
         <h2>Products ({products.length})</h2>
+        <div className="admin-table-scroll">
         <table className="admin-product-table">
           <thead>
             <tr>
@@ -199,6 +200,7 @@ export default function ProductManager() {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );

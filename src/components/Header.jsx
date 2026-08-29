@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useSiteData } from "../context/SiteDataContext.jsx";
 import { whatsappLink } from "../lib/whatsapp.js";
 
 export default function Header() {
   const { content, categories } = useSiteData();
+  const [menuOpen, setMenuOpen] = useState(false);
   if (!content) return null;
 
   const shopCategories = categories.filter((c) => c !== "All");
@@ -11,7 +13,7 @@ export default function Header() {
   return (
     <header className="site-header">
       <div className="header-inner">
-        <Link to="/" className="logo">{content.businessName}</Link>
+        <Link to="/" className="logo" onClick={() => setMenuOpen(false)}>{content.businessName}</Link>
 
         <nav className="main-nav">
           <Link to="/">Home</Link>
@@ -36,7 +38,37 @@ export default function Header() {
         >
           Chat on WhatsApp
         </a>
+
+        <button
+          type="button"
+          className={"nav-toggle" + (menuOpen ? " open" : "")}
+          aria-label="Toggle menu"
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen((v) => !v)}
+        >
+          <span />
+          <span />
+          <span />
+        </button>
       </div>
+
+      {menuOpen && (
+        <nav className="mobile-nav">
+          <Link to="/" onClick={() => setMenuOpen(false)}>Home</Link>
+          <Link to="/" onClick={() => setMenuOpen(false)}>All Products</Link>
+          {shopCategories.map((cat) => (
+            <Link
+              key={cat}
+              to={`/?category=${encodeURIComponent(cat)}`}
+              onClick={() => setMenuOpen(false)}
+            >
+              {cat}
+            </Link>
+          ))}
+          <a href="#testimonials" onClick={() => setMenuOpen(false)}>Reviews</a>
+          <a href="#instagram" onClick={() => setMenuOpen(false)}>Instagram</a>
+        </nav>
+      )}
     </header>
   );
 }
