@@ -10,7 +10,29 @@ const testimonialSchema = new mongoose.Schema(
   { _id: false }
 );
 
-export const SECTION_TYPES = ["hero", "trustBadges", "collection", "shop", "testimonials", "instagram"];
+const heroSlideSchema = new mongoose.Schema(
+  { desktopImage: { type: String, default: "" }, mobileImage: { type: String, default: "" }, caption: { type: String, default: "" } },
+  { _id: false }
+);
+
+const themeSchema = new mongoose.Schema(
+  {
+    primary: { type: String, default: "#e0568c" },
+    secondary: { type: String, default: "#c73f72" },
+    tertiary: { type: String, default: "#fff0f5" },
+  },
+  { _id: false }
+);
+
+export function defaultHeroSlides() {
+  return [
+    { desktopImage: "/hero/slide-1-wide.jpg", mobileImage: "/hero/slide-1-mobile.jpg", caption: "Handmade . Heartfelt . Yours" },
+    { desktopImage: "/hero/slide-2-wide.jpg", mobileImage: "/hero/slide-2-mobile.jpg", caption: "Crochet made beautiful" },
+    { desktopImage: "/hero/slide-3-wide.jpg", mobileImage: "/hero/slide-1-mobile.jpg", caption: "Thoughtfully crafted, Beautifully yours" },
+  ];
+}
+
+export const SECTION_TYPES = ["hero", "aboutUs", "trustBadges", "collection", "shop", "testimonials", "instagram"];
 
 const sectionSchema = new mongoose.Schema(
   {
@@ -27,24 +49,32 @@ const sectionSchema = new mongoose.Schema(
 export function defaultSections() {
   return [
     { id: "hero", type: "hero", enabled: true, order: 0, title: "", settings: {} },
-    { id: "trust-badges", type: "trustBadges", enabled: true, order: 1, title: "", settings: {} },
-    { id: "bestsellers", type: "collection", enabled: true, order: 2, title: "Our Bestsellers", settings: { tag: "Bestseller" } },
-    { id: "shop", type: "shop", enabled: true, order: 3, title: "Shop the Catalog", settings: {} },
-    { id: "testimonials", type: "testimonials", enabled: true, order: 4, title: "What our customers say", settings: {} },
-    { id: "instagram", type: "instagram", enabled: true, order: 5, title: "Follow along on Instagram", settings: {} },
+    { id: "about-us", type: "aboutUs", enabled: true, order: 1, title: "About Us", settings: {} },
+    { id: "trust-badges", type: "trustBadges", enabled: true, order: 2, title: "", settings: {} },
+    { id: "bestsellers", type: "collection", enabled: true, order: 3, title: "Our Bestsellers", settings: { tag: "Bestseller" } },
+    { id: "shop", type: "shop", enabled: true, order: 4, title: "Shop the Catalog", settings: {} },
+    { id: "testimonials", type: "testimonials", enabled: true, order: 5, title: "What our customers say", settings: {} },
+    { id: "instagram", type: "instagram", enabled: true, order: 6, title: "Follow along on Instagram", settings: {} },
   ];
 }
 
 const contentSchema = new mongoose.Schema(
   {
     businessName: { type: String, default: "" },
+    logoUrl: { type: String, default: "" },
     tagline: { type: String, default: "" },
     announcementText: { type: String, default: "" },
-    heroTitle: { type: String, default: "" },
-    heroTagline: { type: String, default: "" },
     heroSubtitle: { type: String, default: "" },
     heroButtonText: { type: String, default: "" },
-    heroImage: { type: String, default: "" },
+    heroSlides: { type: [heroSlideSchema], default: defaultHeroSlides },
+    aboutTitle: { type: String, default: "About Us" },
+    aboutText: {
+      type: String,
+      default:
+        "Aishwarya Crochets is a handmade crochet brand dedicated to creating beautiful, unique, and premium-quality pieces with love and care. From charming bouquets and thoughtful gifts to cute accessories and everyday essentials, every creation is carefully handcrafted stitch by stitch using high-quality materials. We believe handmade pieces should be made to last while bringing warmth, creativity, and a little extra charm to your everyday life. 🧶♡",
+    },
+    deliveryText: { type: String, default: "Delivered in 15 to 20 days" },
+    freeDeliveryThreshold: { type: Number, default: 500 },
     whatsappNumber: { type: String, default: "" },
     whatsappGeneralMessage: { type: String, default: "" },
     footerText: { type: String, default: "" },
@@ -60,6 +90,7 @@ const contentSchema = new mongoose.Schema(
     testimonials: { type: [testimonialSchema], default: [] },
     sections: { type: [sectionSchema], default: defaultSections },
     tags: { type: [String], default: ["Bestseller"] },
+    theme: { type: themeSchema, default: () => ({}) },
   },
   { timestamps: true }
 );
@@ -76,6 +107,16 @@ export async function getOrCreateContent() {
   }
   if (!doc.tags || doc.tags.length === 0) {
     doc.tags = ["Bestseller"];
+    dirty = true;
+  }
+  if (!doc.heroSlides || doc.heroSlides.length === 0) {
+    doc.heroSlides = defaultHeroSlides();
+    dirty = true;
+  }
+  if (!doc.sections.some((s) => s.type === "aboutUs")) {
+    const heroIdx = doc.sections.findIndex((s) => s.type === "hero");
+    doc.sections.splice(heroIdx + 1, 0, { id: "about-us", type: "aboutUs", enabled: true, order: heroIdx + 1, title: "About Us", settings: {} });
+    doc.sections.forEach((s, i) => { s.order = i; });
     dirty = true;
   }
   if (dirty) await doc.save();

@@ -93,3 +93,13 @@ export async function fetchContent() {
 export async function updateContent(content) {
   return request("/api/content", { method: "PUT", body: content, auth: true });
 }
+
+export async function submitReview(productId, review) {
+  const product = await request(`/api/products/${productId}/reviews`, { method: "POST", body: review });
+  return normalizeProduct(product);
+}
+
+export async function deleteReview(productId, reviewId) {
+  const product = await request(`/api/products/${productId}/reviews/${reviewId}`, { method: "DELETE", auth: true });
+  return normalizeProduct(product);
+}

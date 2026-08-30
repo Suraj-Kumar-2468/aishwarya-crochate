@@ -48,4 +48,26 @@ router.delete("/:id", requireAdmin, asyncHandler(async (req, res) => {
   res.json({ ok: true });
 }));
 
+router.post("/:id/reviews", asyncHandler(async (req, res) => {
+  const { name, rating, text } = req.body;
+  const ratingNum = Number(rating);
+  if (!name || !String(name).trim()) return res.status(400).json({ error: "Name is required" });
+  if (!Number.isInteger(ratingNum) || ratingNum < 1 || ratingNum > 5) {
+    return res.status(400).json({ error: "Rating must be an integer from 1 to 5" });
+  }
+  const product = await Product.findById(req.params.id);
+  if (!product) return res.status(404).json({ error: "Product not found" });
+  product.reviews.push({ name: String(name).trim(), rating: ratingNum, text: text ? String(text).trim() : "" });
+  await product.save();
+  res.status(201).json(product);
+}));
+
+router.delete("/:id/reviews/:reviewId", requireAdmin, asyncHandler(async (req, res) => {
+  const product = await Product.findById(req.params.id);
+  if (!product) return res.status(404).json({ error: "Product not found" });
+  product.reviews = product.reviews.filter((r) => String(r._id) !== req.params.reviewId);
+  await product.save();
+  res.json(product);
+}));
+
 export default router;

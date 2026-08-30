@@ -27,6 +27,17 @@ export function SiteDataProvider({ children }) {
     refetch();
   }, [refetch]);
 
+  useEffect(() => {
+    if (!content?.theme) return;
+    const root = document.documentElement.style;
+    if (content.theme.primary) root.setProperty("--accent", content.theme.primary);
+    if (content.theme.secondary) root.setProperty("--accent-hover", content.theme.secondary);
+    if (content.theme.tertiary) {
+      root.setProperty("--bg-soft", content.theme.tertiary);
+      root.setProperty("--accent-soft", content.theme.tertiary);
+    }
+  }, [content?.theme]);
+
   const categories = content?.categories || ["All"];
 
   return (

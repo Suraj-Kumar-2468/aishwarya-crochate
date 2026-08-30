@@ -13,7 +13,13 @@ export default function Header() {
   return (
     <header className="site-header">
       <div className="header-inner">
-        <Link to="/" className="logo" onClick={() => setMenuOpen(false)}>{content.businessName}</Link>
+        <Link to="/" className="header-logo-slot" onClick={() => setMenuOpen(false)}>
+          {content.logoUrl ? (
+            <img src={content.logoUrl} alt={content.businessName} className="site-logo-img" />
+          ) : (
+            <span className="logo">{content.businessName}</span>
+          )}
+        </Link>
 
         <nav className="main-nav">
           <Link to="/">Home</Link>
@@ -30,26 +36,28 @@ export default function Header() {
           <a href="#instagram">Instagram</a>
         </nav>
 
-        <a
-          className="whatsapp-pill"
-          href={whatsappLink(content.whatsappNumber, content.whatsappGeneralMessage)}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Chat on WhatsApp
-        </a>
+        <div className="header-actions">
+          <a
+            className="whatsapp-pill"
+            href={whatsappLink(content.whatsappNumber, content.whatsappGeneralMessage)}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Chat on WhatsApp
+          </a>
 
-        <button
-          type="button"
-          className={"nav-toggle" + (menuOpen ? " open" : "")}
-          aria-label="Toggle menu"
-          aria-expanded={menuOpen}
-          onClick={() => setMenuOpen((v) => !v)}
-        >
-          <span />
-          <span />
-          <span />
-        </button>
+          <button
+            type="button"
+            className={"nav-toggle" + (menuOpen ? " open" : "")}
+            aria-label="Toggle menu"
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((v) => !v)}
+          >
+            <span />
+            <span />
+            <span />
+          </button>
+        </div>
       </div>
 
       {menuOpen && (

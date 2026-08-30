@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { createProduct, updateProduct, deleteProduct, uploadImage, deleteImage } from "../../api.js";
+import { createProduct, updateProduct, deleteProduct, uploadImage, deleteImage, deleteReview } from "../../api.js";
 import { useSiteData } from "../../context/SiteDataContext.jsx";
 
-const EMPTY_PRODUCT = { name: "", category: "", price: "", mrp: "", tag: "", images: [], description: "" };
+const EMPTY_PRODUCT = { name: "", category: "", price: "", mrp: "", tag: "", images: [], description: "", badges: [], reviews: [] };
 
 export default function ProductManager() {
   const { products, categories, content, refetch } = useSiteData();
@@ -57,6 +57,31 @@ export default function ProductManager() {
     setForm((f) => ({ ...f, [key]: value }));
   }
 
+  function setBadge(index, key, value) {
+    const badges = form.badges.map((b, i) => (i === index ? { ...b, [key]: value } : b));
+    setField("badges", badges);
+  }
+
+  function addBadge() {
+    setField("badges", [...form.badges, { icon: "", text: "" }]);
+  }
+
+  function removeBadge(index) {
+    setField("badges", form.badges.filter((_, i) => i !== index));
+  }
+
+  async function handleDeleteReview(reviewId) {
+    if (!editingId) return;
+    if (!confirm("Delete this review?")) return;
+    try {
+      await deleteReview(editingId, reviewId);
+      await refetch();
+      setForm((f) => ({ ...f, reviews: f.reviews.filter((r) => r._id !== reviewId) }));
+    } catch (err) {
+      setMessage(err.message || "Delete failed");
+    }
+  }
+
   function startEdit(product) {
     setEditingId(product.id);
     setForm({
@@ -67,6 +92,8 @@ export default function ProductManager() {
       tag: product.tag || "",
       images: (product.images || []).map((img) => ({ ...img })),
       description: product.description || "",
+      badges: (product.badges || []).map((b) => ({ ...b })),
+      reviews: product.reviews || [],
     });
   }
 
@@ -91,6 +118,7 @@ export default function ProductManager() {
       tag: form.tag || null,
       images: form.images,
       description: form.description,
+      badges: form.badges,
     };
     try {
       if (editingId) {
@@ -182,6 +210,32 @@ export default function ProductManager() {
           Description
           <textarea value={form.description} onChange={(e) => setField("description", e.target.value)} rows={3} />
         </label>
+
+        <fieldset className="admin-fieldset">
+          <legend>Badges (e.g. Secure Payment, Assured Quality)</legend>
+          {form.badges.map((b, i) => (
+            <div key={i} className="admin-list-row">
+              <input placeholder="Icon (emoji or URL)" value={b.icon} onChange={(e) => setBadge(i, "icon", e.target.value)} />
+              <input placeholder="Text" value={b.text} onChange={(e) => setBadge(i, "text", e.target.value)} />
+              <button type="button" onClick={() => removeBadge(i)}>Remove</button>
+            </div>
+          ))}
+          <button type="button" onClick={addBadge}>+ Add Badge</button>
+        </fieldset>
+
+        {editingId && (
+          <fieldset className="admin-fieldset">
+            <legend>Reviews ({form.reviews.length})</legend>
+            {form.reviews.length === 0 && <p className="admin-hint">No reviews yet.</p>}
+            {form.reviews.map((r) => (
+              <div key={r._id} className="admin-list-row">
+                <span>{"★".repeat(r.rating)}{"☆".repeat(5 - r.rating)} — {r.name}{r.text ? `: ${r.text}` : ""}</span>
+                <button type="button" onClick={() => handleDeleteReview(r._id)}>Delete</button>
+              </div>
+            ))}
+          </fieldset>
+        )}
+
         {message && <p className="admin-form-message">{message}</p>}
         <div className="admin-form-actions">
           <button type="submit" className="btn btn-primary" disabled={saving}>

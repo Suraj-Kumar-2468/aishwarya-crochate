@@ -7,7 +7,7 @@ import { asyncHandler } from "../middleware/asyncHandler.js";
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 8 * 1024 * 1024 } });
 const router = Router();
 
-const ALLOWED_FOLDERS = ["products", "testimonials"];
+const ALLOWED_FOLDERS = ["products", "testimonials", "brand", "hero", "badges"];
 
 router.post("/", requireAdmin, upload.single("image"), asyncHandler(async (req, res) => {
   if (!req.file) return res.status(400).json({ error: "No file uploaded" });
