@@ -31,7 +31,6 @@ export default function Header() {
               ))}
             </div>
           </div>
-          <a href="#testimonials">Reviews</a>
           <a href="#instagram">Instagram</a>
         </nav>
 
@@ -72,7 +71,6 @@ export default function Header() {
               {cat}
             </Link>
           ))}
-          <a href="#testimonials" onClick={() => setMenuOpen(false)}>Reviews</a>
           <a href="#instagram" onClick={() => setMenuOpen(false)}>Instagram</a>
         </nav>
       )}
