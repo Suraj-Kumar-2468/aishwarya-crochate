@@ -3,6 +3,7 @@ import { useParams, Link, Navigate } from "react-router-dom";
 import { useSiteData, getProductById } from "../context/SiteDataContext.jsx";
 import { whatsappLink, buyNowMessage } from "../lib/whatsapp.js";
 import { submitReview } from "../api.js";
+import TrustBadges from "../components/TrustBadges.jsx";
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -11,6 +12,7 @@ export default function ProductDetail() {
   const [reviewForm, setReviewForm] = useState({ name: "", rating: 5, text: "" });
   const [reviewMessage, setReviewMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [starFilter, setStarFilter] = useState(0);
 
   if (loading) return null;
 
@@ -23,6 +25,11 @@ export default function ProductDetail() {
   const avgRating = reviews.length
     ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
     : null;
+  const ratingCounts = [5, 4, 3, 2, 1].map((n) => ({
+    n,
+    count: reviews.filter((r) => r.rating === n).length,
+  }));
+  const filteredReviews = starFilter ? reviews.filter((r) => r.rating === starFilter) : reviews;
 
   async function handleReviewSubmit(e) {
     e.preventDefault();
@@ -101,6 +108,15 @@ export default function ProductDetail() {
             )}
           </div>
           <p className="product-detail-description">{product.description}</p>
+
+          {product.highlights?.length > 0 && (
+            <ul className="product-highlights">
+              {product.highlights.map((h, i) => (
+                <li key={i}>{h}</li>
+              ))}
+            </ul>
+          )}
+
           <a
             className="buy-now-btn buy-now-btn-large"
             href={whatsappLink(content?.whatsappNumber, buyNowMessage(product))}
@@ -131,66 +147,105 @@ export default function ProductDetail() {
               <span>🎁 Free delivery above ₹{content.freeDeliveryThreshold}</span>
             )}
           </div>
+
+          {product.careInstructions && (
+            <div className="product-care-info">
+              <strong>Care Instructions</strong>
+              <p>{product.careInstructions}</p>
+            </div>
+          )}
         </div>
       </div>
 
-      <section className="product-reviews-section">
-        <h2 className="section-title">Reviews</h2>
-        <div className="product-reviews-summary">
-          {avgRating ? (
-            <>
-              <span className="product-reviews-avg">{avgRating} ★</span>
-              <span>({reviews.length} review{reviews.length !== 1 ? "s" : ""})</span>
-            </>
-          ) : (
-            <span>No reviews yet — be the first!</span>
-          )}
-        </div>
+      <div className="full-bleed">
+        <TrustBadges />
+      </div>
 
-        {reviews.length > 0 && (
-          <div className="review-list">
-            {reviews.map((r, i) => (
-              <div key={r._id || i} className="review-item">
-                <div className="review-item-header">
-                  <span className="review-item-name">{r.name}</span>
-                  <span className="testimonial-stars">{"★".repeat(r.rating)}{"☆".repeat(5 - r.rating)}</span>
-                </div>
-                {r.text && <p className="review-item-text">{r.text}</p>}
-              </div>
-            ))}
+      <section className="product-reviews-section full-bleed">
+        <div className="product-reviews-inner">
+          <h2 className="section-title">Reviews</h2>
+          <div className="product-reviews-summary">
+            {avgRating ? (
+              <>
+                <span className="product-reviews-avg">{avgRating} ★</span>
+                <span>({reviews.length} review{reviews.length !== 1 ? "s" : ""})</span>
+              </>
+            ) : (
+              <span>No reviews yet — be the first!</span>
+            )}
           </div>
-        )}
 
-        <form className="review-form" onSubmit={handleReviewSubmit}>
-          <div className="star-input">
-            {[1, 2, 3, 4, 5].map((n) => (
+          {reviews.length > 0 && (
+            <div className="review-filter-bar">
               <button
-                key={n}
                 type="button"
-                className={n <= reviewForm.rating ? "filled" : ""}
-                aria-label={`Rate ${n} star${n > 1 ? "s" : ""}`}
-                onClick={() => setReviewForm((f) => ({ ...f, rating: n }))}
+                className={"review-filter-chip" + (starFilter === 0 ? " active" : "")}
+                onClick={() => setStarFilter(0)}
               >
-                ★
+                All ({reviews.length})
               </button>
-            ))}
-          </div>
-          <input
-            placeholder="Your name"
-            value={reviewForm.name}
-            onChange={(e) => setReviewForm((f) => ({ ...f, name: e.target.value }))}
-          />
-          <textarea
-            placeholder="Share your experience (optional)"
-            rows={3}
-            value={reviewForm.text}
-            onChange={(e) => setReviewForm((f) => ({ ...f, text: e.target.value }))}
-          />
-          {reviewMessage && <p className="admin-form-message">{reviewMessage}</p>}
-          <button type="submit" className="btn btn-primary" disabled={submitting}>
-            {submitting ? "Submitting…" : "Submit Review"}
-          </button>
-        </form>
+              {ratingCounts.map(({ n, count }) => (
+                <button
+                  key={n}
+                  type="button"
+                  className={"review-filter-chip" + (starFilter === n ? " active" : "")}
+                  disabled={count === 0}
+                  onClick={() => setStarFilter(n)}
+                >
+                  {n} ★ ({count})
+                </button>
+              ))}
+            </div>
+          )}
+
+          {filteredReviews.length > 0 && (
+            <div className="review-list">
+              {filteredReviews.map((r, i) => (
+                <div key={r._id || i} className="review-item">
+                  <div className="review-item-header">
+                    <span className="review-item-name">{r.name}</span>
+                    <span className="testimonial-stars">{"★".repeat(r.rating)}{"☆".repeat(5 - r.rating)}</span>
+                  </div>
+                  {r.text && <p className="review-item-text">{r.text}</p>}
+                </div>
+              ))}
+            </div>
+          )}
+          {reviews.length > 0 && filteredReviews.length === 0 && (
+            <p className="admin-hint">No reviews with this rating.</p>
+          )}
+
+          <form className="review-form" onSubmit={handleReviewSubmit}>
+            <div className="star-input">
+              {[1, 2, 3, 4, 5].map((n) => (
+                <button
+                  key={n}
+                  type="button"
+                  className={n <= reviewForm.rating ? "filled" : ""}
+                  aria-label={`Rate ${n} star${n > 1 ? "s" : ""}`}
+                  onClick={() => setReviewForm((f) => ({ ...f, rating: n }))}
+                >
+                  ★
+                </button>
+              ))}
+            </div>
+            <input
+              placeholder="Your name"
+              value={reviewForm.name}
+              onChange={(e) => setReviewForm((f) => ({ ...f, name: e.target.value }))}
+            />
+            <textarea
+              placeholder="Share your experience (optional)"
+              rows={3}
+              value={reviewForm.text}
+              onChange={(e) => setReviewForm((f) => ({ ...f, text: e.target.value }))}
+            />
+            {reviewMessage && <p className="admin-form-message">{reviewMessage}</p>}
+            <button type="submit" className="btn btn-primary" disabled={submitting}>
+              {submitting ? "Submitting…" : "Submit Review"}
+            </button>
+          </form>
+        </div>
       </section>
     </main>
   );

@@ -18,10 +18,10 @@
   "instagramUrl": "https://www.instagram.com/",
   "facebookUrl": "https://www.facebook.com/",
   "trustMarkers": [
-    { "icon": "🧶", "text": "100% Handmade" },
-    { "icon": "💬", "text": "Order via WhatsApp" },
-    { "icon": "🚚", "text": "Pan-India Shipping" },
-    { "icon": "🎨", "text": "Custom Colors Available" }
+    { "icon": "💳", "text": "Secure Payments" },
+    { "icon": "🏅", "text": "Assured Quality" },
+    { "icon": "🇮🇳", "text": "Made In India" },
+    { "icon": "🛵", "text": "Timely Delivery" }
   ],
   "testimonials": [
     { "name": "Placeholder Customer 1", "text": "Placeholder review — absolutely loved the quality and detail!", "rating": 5 },

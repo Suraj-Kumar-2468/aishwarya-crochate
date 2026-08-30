@@ -2,7 +2,19 @@ import { useState } from "react";
 import { createProduct, updateProduct, deleteProduct, uploadImage, deleteImage, deleteReview } from "../../api.js";
 import { useSiteData } from "../../context/SiteDataContext.jsx";
 
-const EMPTY_PRODUCT = { name: "", category: "", price: "", mrp: "", tag: "", images: [], description: "", badges: [], reviews: [] };
+const EMPTY_PRODUCT = {
+  name: "",
+  category: "",
+  price: "",
+  mrp: "",
+  tag: "",
+  images: [],
+  description: "",
+  highlightsText: "",
+  careInstructions: "",
+  badges: [],
+  reviews: [],
+};
 
 export default function ProductManager() {
   const { products, categories, content, refetch } = useSiteData();
@@ -92,6 +104,8 @@ export default function ProductManager() {
       tag: product.tag || "",
       images: (product.images || []).map((img) => ({ ...img })),
       description: product.description || "",
+      highlightsText: (product.highlights || []).join("\n"),
+      careInstructions: product.careInstructions || "",
       badges: (product.badges || []).map((b) => ({ ...b })),
       reviews: product.reviews || [],
     });
@@ -118,6 +132,11 @@ export default function ProductManager() {
       tag: form.tag || null,
       images: form.images,
       description: form.description,
+      highlights: form.highlightsText
+        .split("\n")
+        .map((line) => line.trim())
+        .filter(Boolean),
+      careInstructions: form.careInstructions,
       badges: form.badges,
     };
     try {
@@ -209,6 +228,26 @@ export default function ProductManager() {
         <label className="admin-field admin-field-full">
           Description
           <textarea value={form.description} onChange={(e) => setField("description", e.target.value)} rows={3} />
+        </label>
+
+        <label className="admin-field admin-field-full">
+          Highlights (one per line — shown as a bullet list on the product page)
+          <textarea
+            value={form.highlightsText}
+            onChange={(e) => setField("highlightsText", e.target.value)}
+            rows={4}
+            placeholder={"Soft cotton-blend yarn\nHandmade to order\nAvailable in 6 colors"}
+          />
+        </label>
+
+        <label className="admin-field admin-field-full">
+          Care Instructions
+          <textarea
+            value={form.careInstructions}
+            onChange={(e) => setField("careInstructions", e.target.value)}
+            rows={2}
+            placeholder="Hand wash cold, lay flat to dry, do not bleach."
+          />
         </label>
 
         <fieldset className="admin-fieldset">

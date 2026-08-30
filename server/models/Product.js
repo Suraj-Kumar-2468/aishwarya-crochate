@@ -33,6 +33,8 @@ const productSchema = new mongoose.Schema(
       validate: { validator: (v) => v.length > 0, message: "At least one image is required" },
     },
     description: { type: String, default: "" },
+    highlights: { type: [String], default: [] },
+    careInstructions: { type: String, default: "" },
     badges: { type: [productBadgeSchema], default: [] },
     reviews: { type: [productReviewSchema], default: [] },
   },
