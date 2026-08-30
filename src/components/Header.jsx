@@ -14,11 +14,10 @@ export default function Header() {
     <header className="site-header">
       <div className="header-inner">
         <Link to="/" className="header-logo-slot" onClick={() => setMenuOpen(false)}>
-          {content.logoUrl ? (
-            <img src={content.logoUrl} alt={content.businessName} className="site-logo-img" />
-          ) : (
-            <span className="logo">{content.businessName}</span>
+          {content.logoUrl && (
+            <img src={content.logoUrl} alt={content.businessName || "Logo"} className="site-logo-img" />
           )}
+          {content.businessName && <span className="logo">{content.businessName}</span>}
         </Link>
 
         <nav className="main-nav">
