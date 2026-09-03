@@ -17,9 +17,9 @@ const heroSlideSchema = new mongoose.Schema(
 
 const themeSchema = new mongoose.Schema(
   {
-    primary: { type: String, default: "#e0568c" },
-    secondary: { type: String, default: "#c73f72" },
-    tertiary: { type: String, default: "#fff0f5" },
+    primary: { type: String, default: "#6fae8e" },
+    secondary: { type: String, default: "#55916f" },
+    tertiary: { type: String, default: "#eff8f2" },
   },
   { _id: false }
 );
