@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useLocation } from "react-router-dom";
 import { useSiteData } from "../context/SiteDataContext.jsx";
 import CategoryFilter from "../components/CategoryFilter.jsx";
 import ProductCard from "../components/ProductCard.jsx";
@@ -14,14 +14,20 @@ import useReveal from "../hooks/useReveal.js";
 export default function Home() {
   const { content, products, categories, loading, error } = useSiteData();
   const [searchParams] = useSearchParams();
+  const location = useLocation();
   const [active, setActive] = useState(searchParams.get("category") || "All");
-  const [heroRef, heroVisible] = useReveal();
   const [titleRef, titleVisible] = useReveal();
 
   useEffect(() => {
     const fromUrl = searchParams.get("category");
     if (fromUrl && categories.includes(fromUrl)) setActive(fromUrl);
   }, [searchParams, categories]);
+
+  useEffect(() => {
+    if (location.hash !== "#shop") return;
+    const el = document.getElementById("shop");
+    el?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [location.hash, location.search]);
 
   const items = useMemo(
     () => (active === "All" ? products : products.filter((p) => p.category === active)),
@@ -46,8 +52,6 @@ export default function Home() {
             tagline={content.tagline}
             subtitle={content.heroSubtitle}
             buttonText={content.heroButtonText}
-            revealRef={heroRef}
-            revealVisible={heroVisible}
           />
         );
 
@@ -71,8 +75,8 @@ export default function Home() {
             </h2>
             <CategoryFilter categories={categories} active={active} onChange={setActive} />
             <div className="catalog">
-              {items.map((product) => (
-                <ProductCard key={product.id} product={product} />
+              {items.map((product, i) => (
+                <ProductCard key={product.id} product={product} position={i} />
               ))}
             </div>
           </section>

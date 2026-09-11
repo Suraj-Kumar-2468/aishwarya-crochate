@@ -1,17 +1,40 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { useSiteData } from "../context/SiteDataContext.jsx";
 import { whatsappLink } from "../lib/whatsapp.js";
 
 export default function Header() {
   const { content, categories } = useSiteData();
   const [menuOpen, setMenuOpen] = useState(false);
+  const headerRef = useRef(null);
+  const location = useLocation();
+  const activeCategory = new URLSearchParams(location.search).get("category");
+
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el) return;
+    let ticking = false;
+    function update() {
+      el.classList.toggle("scrolled", window.scrollY > 8);
+      ticking = false;
+    }
+    function onScroll() {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(update);
+      }
+    }
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   if (!content) return null;
 
   const shopCategories = categories.filter((c) => c !== "All");
 
   return (
-    <header className="site-header">
+    <header className="site-header" ref={headerRef}>
       <div className="header-inner">
         <Link to="/" className="header-logo-slot" onClick={() => setMenuOpen(false)}>
           {content.logoUrl && (
@@ -25,9 +48,15 @@ export default function Header() {
           <div className="nav-dropdown">
             <span>Shop ▾</span>
             <div className="nav-dropdown-menu">
-              <Link to="/">All Products</Link>
+              <Link to="/#shop" className={!activeCategory ? "active" : ""}>All Products</Link>
               {shopCategories.map((cat) => (
-                <Link key={cat} to={`/?category=${encodeURIComponent(cat)}`}>{cat}</Link>
+                <Link
+                  key={cat}
+                  to={`/?category=${encodeURIComponent(cat)}#shop`}
+                  className={activeCategory === cat ? "active" : ""}
+                >
+                  {cat}
+                </Link>
               ))}
             </div>
           </div>
@@ -61,11 +90,18 @@ export default function Header() {
       {menuOpen && (
         <nav className="mobile-nav">
           <Link to="/" onClick={() => setMenuOpen(false)}>Home</Link>
-          <Link to="/" onClick={() => setMenuOpen(false)}>All Products</Link>
+          <Link
+            to="/#shop"
+            className={!activeCategory ? "active" : ""}
+            onClick={() => setMenuOpen(false)}
+          >
+            All Products
+          </Link>
           {shopCategories.map((cat) => (
             <Link
               key={cat}
-              to={`/?category=${encodeURIComponent(cat)}`}
+              to={`/?category=${encodeURIComponent(cat)}#shop`}
+              className={activeCategory === cat ? "active" : ""}
               onClick={() => setMenuOpen(false)}
             >
               {cat}
