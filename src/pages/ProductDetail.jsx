@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, Link, Navigate } from "react-router-dom";
 import { useSiteData, getProductById } from "../context/SiteDataContext.jsx";
 import { whatsappLink, buyNowMessage } from "../lib/whatsapp.js";
@@ -13,6 +13,10 @@ export default function ProductDetail() {
   const [reviewMessage, setReviewMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [starFilter, setStarFilter] = useState(0);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [id]);
 
   if (loading) return null;
 
