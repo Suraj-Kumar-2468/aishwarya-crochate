@@ -179,15 +179,15 @@ export default function ContentEditor() {
         <div className="admin-field-grid">
           <label className="admin-field">
             Primary
-            <input type="color" value={form.theme?.primary || "#e0568c"} onChange={(e) => setTheme("primary", e.target.value)} />
+            <input type="color" value={form.theme?.primary || "#ffc7c7"} onChange={(e) => setTheme("primary", e.target.value)} />
           </label>
           <label className="admin-field">
             Secondary
-            <input type="color" value={form.theme?.secondary || "#c73f72"} onChange={(e) => setTheme("secondary", e.target.value)} />
+            <input type="color" value={form.theme?.secondary || "#3c2218"} onChange={(e) => setTheme("secondary", e.target.value)} />
           </label>
           <label className="admin-field">
             Tertiary
-            <input type="color" value={form.theme?.tertiary || "#fff0f5"} onChange={(e) => setTheme("tertiary", e.target.value)} />
+            <input type="color" value={form.theme?.tertiary || "#ffe6e6"} onChange={(e) => setTheme("tertiary", e.target.value)} />
           </label>
         </div>
       </fieldset>

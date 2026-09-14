@@ -31,6 +31,35 @@ export default function HeroCarousel({ slides, tagline, subtitle, buttonText }) 
 
   return (
     <section id="top" className="hero">
+      <div className="hero-bg-carousel" aria-hidden="true">
+        {slides.map((s, i) => (
+          <div
+            key={i}
+            className={"hero-bg-slide" + (i === index ? " active" : "")}
+            style={{ backgroundImage: `url(${s.mobileImage || s.desktopImage})` }}
+          />
+        ))}
+        <div className="hero-bg-overlay" />
+      </div>
+
+      {slides.length > 1 && (
+        <>
+          <button type="button" className="hero-bg-nav hero-bg-nav-prev" onClick={prev} aria-label="Previous slide">&#8249;</button>
+          <button type="button" className="hero-bg-nav hero-bg-nav-next" onClick={next} aria-label="Next slide">&#8250;</button>
+          <div className="hero-bg-dots">
+            {slides.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                className={"hero-bg-dot" + (i === index ? " active" : "")}
+                aria-label={`Go to slide ${i + 1}`}
+                onClick={() => setIndex(i)}
+              />
+            ))}
+          </div>
+        </>
+      )}
+
       <div className="hero-inner">
         <div className="hero-copy">
           <p className="hero-eyebrow">{tagline}</p>

@@ -87,13 +87,14 @@ export default function Header() {
         </div>
       </div>
 
-      {menuOpen && (
-        <nav className="mobile-nav">
-          <Link to="/" onClick={() => setMenuOpen(false)}>Home</Link>
+      <nav className={"mobile-nav" + (menuOpen ? " open" : "")} aria-hidden={!menuOpen}>
+        <div className="mobile-nav-inner">
+          <Link to="/" onClick={() => setMenuOpen(false)} tabIndex={menuOpen ? 0 : -1}>Home</Link>
           <Link
             to="/#shop"
             className={!activeCategory ? "active" : ""}
             onClick={() => setMenuOpen(false)}
+            tabIndex={menuOpen ? 0 : -1}
           >
             All Products
           </Link>
@@ -103,13 +104,16 @@ export default function Header() {
               to={`/?category=${encodeURIComponent(cat)}#shop`}
               className={activeCategory === cat ? "active" : ""}
               onClick={() => setMenuOpen(false)}
+              tabIndex={menuOpen ? 0 : -1}
             >
               {cat}
             </Link>
           ))}
-          <a href="#instagram" onClick={() => setMenuOpen(false)}>Instagram</a>
-        </nav>
-      )}
+          <a href="#instagram" onClick={() => setMenuOpen(false)} tabIndex={menuOpen ? 0 : -1}>
+            Instagram
+          </a>
+        </div>
+      </nav>
     </header>
   );
 }
