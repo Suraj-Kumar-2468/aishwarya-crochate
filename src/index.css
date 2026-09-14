@@ -741,8 +741,8 @@ a { color: inherit; text-decoration: none; }
   z-index: 1;
 }
 
-.product-tag.tag-offer { background: #f0973c; }
-.product-tag.tag-new { background: #6c8ee0; }
+.product-tag.tag-offer { background: #f0973c; color: #fff; }
+.product-tag.tag-new { background: var(--accent-hover); color: #fff; }
 
 .product-info { padding: 16px 18px 8px; flex: 1; }
 
