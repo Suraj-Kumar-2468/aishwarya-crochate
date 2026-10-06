@@ -1,6 +1,7 @@
 import { WebSocketServer } from "ws";
 import jwt from "jsonwebtoken";
 import { ChatUser, ChatMessage, LoginAttempt } from "./models/Chat.js";
+import { sendOfflineAlert } from "./mailer.js";
 
 const savePassword = (pw) => pw; // swap for a hash later
 const checkPassword = (pw, stored) => pw === stored; // swap for compare later
@@ -87,6 +88,7 @@ async function handleCustomer(ws, state, msg, ip) {
     const saved = serialize(await ChatMessage.create({ username: state.username, from: "user", text: text || product.name, product }));
     sendAll(customers.get(state.username), { type: "message", message: saved });
     sendAll(admins, { type: "message", message: saved });
+    if (admins.size === 0) sendOfflineAlert(saved);
   }
 }
 
