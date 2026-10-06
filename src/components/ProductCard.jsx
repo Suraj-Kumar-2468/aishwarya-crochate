@@ -2,15 +2,12 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import useReveal from "../hooks/useReveal.js";
 import useParallax from "../hooks/useParallax.js";
-import { whatsappLink, buyNowMessage } from "../lib/whatsapp.js";
-import { useSiteData } from "../context/SiteDataContext.jsx";
 
 const PARALLAX_SPEEDS = [0.05, -0.04, 0.07, -0.03];
 
 export default function ProductCard({ product, position = 0 }) {
   const [ref, visible] = useReveal();
   const parallaxRef = useParallax(PARALLAX_SPEEDS[position % PARALLAX_SPEEDS.length], 16);
-  const { content } = useSiteData();
   const [index, setIndex] = useState(0);
 
   const images = product.images?.length ? product.images : [];
@@ -54,14 +51,13 @@ export default function ProductCard({ product, position = 0 }) {
             </div>
           </>
         )}
-        <a
+        <Link
           className="buy-now-btn"
-          href={whatsappLink(content?.whatsappNumber, buyNowMessage(product))}
-          target="_blank"
-          rel="noopener noreferrer"
+          to="/chat"
+          state={{ product: { id: product.id, name: product.name, price: product.price, image: images[0]?.url || "" } }}
         >
           Buy Now
-        </a>
+        </Link>
       </div>
       <Link to={`/product/${product.id}`} className="product-card-link">
         <div className="product-info">

@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, Navigate } from "react-router-dom";
 import { useSiteData, getProductById } from "../context/SiteDataContext.jsx";
-import { whatsappLink, buyNowMessage } from "../lib/whatsapp.js";
 import { submitReview } from "../api.js";
 import TrustBadges from "../components/TrustBadges.jsx";
 
@@ -121,14 +120,13 @@ export default function ProductDetail() {
             </ul>
           )}
 
-          <a
+          <Link
             className="buy-now-btn buy-now-btn-large"
-            href={whatsappLink(content?.whatsappNumber, buyNowMessage(product))}
-            target="_blank"
-            rel="noopener noreferrer"
+            to="/chat"
+            state={{ product: { id: product.id, name: product.name, price: product.price, image: images[0]?.url || "" } }}
           >
             Buy Now
-          </a>
+          </Link>
 
           {product.badges?.length > 0 && (
             <div className="product-badges">

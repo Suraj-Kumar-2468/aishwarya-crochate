@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useSiteData } from "../context/SiteDataContext.jsx";
-import { whatsappLink } from "../lib/whatsapp.js";
 
 export default function Header() {
   const { content, categories } = useSiteData();
@@ -64,14 +63,7 @@ export default function Header() {
         </nav>
 
         <div className="header-actions">
-          <a
-            className="whatsapp-pill"
-            href={whatsappLink(content.whatsappNumber, content.whatsappGeneralMessage)}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Chat on WhatsApp
-          </a>
+          <Link className="chat-pill" to="/chat">Chat with us</Link>
 
           <button
             type="button"
@@ -112,6 +104,14 @@ export default function Header() {
           <a href="#instagram" onClick={() => setMenuOpen(false)} tabIndex={menuOpen ? 0 : -1}>
             Instagram
           </a>
+          <Link
+            className="mobile-nav-chat"
+            to="/chat"
+            onClick={() => setMenuOpen(false)}
+            tabIndex={menuOpen ? 0 : -1}
+          >
+            Chat with us
+          </Link>
         </div>
       </nav>
     </header>

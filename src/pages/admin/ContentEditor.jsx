@@ -10,8 +10,6 @@ const TEXT_FIELDS = [
   ["heroButtonText", "Hero Button Text"],
   ["deliveryText", "Delivery Text"],
   ["freeDeliveryThreshold", "Free Delivery Above (₹)"],
-  ["whatsappNumber", "WhatsApp Number"],
-  ["whatsappGeneralMessage", "WhatsApp General Message"],
   ["footerText", "Footer Text"],
   ["instagramHandle", "Instagram Handle"],
   ["instagramUrl", "Instagram URL"],

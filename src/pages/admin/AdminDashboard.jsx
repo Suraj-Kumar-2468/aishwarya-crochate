@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { clearToken } from "../../api.js";
+import ChatManager from "./ChatManager.jsx";
 import ContentEditor from "./ContentEditor.jsx";
 import ProductManager from "./ProductManager.jsx";
 import SectionManager from "./SectionManager.jsx";
@@ -51,12 +52,20 @@ export default function AdminDashboard() {
         >
           Tags
         </button>
+        <button
+          type="button"
+          className={tab === "chat" ? "admin-tab active" : "admin-tab"}
+          onClick={() => setTab("chat")}
+        >
+          Chat
+        </button>
       </div>
 
       {tab === "products" && <ProductManager />}
       {tab === "content" && <ContentEditor />}
       {tab === "sections" && <SectionManager />}
       {tab === "tags" && <TagManager />}
+      {tab === "chat" && <ChatManager />}
     </main>
   );
 }

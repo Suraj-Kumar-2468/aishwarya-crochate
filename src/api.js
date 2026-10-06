@@ -103,3 +103,7 @@ export async function deleteReview(productId, reviewId) {
   const product = await request(`/api/products/${productId}/reviews/${reviewId}`, { method: "DELETE", auth: true });
   return normalizeProduct(product);
 }
+
+export function chatSocketUrl() {
+  return API_BASE.replace(/^http/, "ws") + "/ws";
+}

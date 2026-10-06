@@ -10,6 +10,8 @@ import uploadRoutes from "./routes/upload.js";
 import Product from "./models/Product.js";
 import Content from "./models/Content.js";
 import { loadSeedData } from "./seedData.js";
+import http from "http";
+import { attachChat } from "./chat.js";
 
 async function seedIfEmpty() {
   const [productCount, contentCount] = await Promise.all([
@@ -53,5 +55,7 @@ const port = process.env.PORT || 4000;
 connectDb()
   .then(seedIfEmpty)
   .then(() => {
-    app.listen(port, () => console.log(`API listening on http://localhost:${port}`));
+    const server = http.createServer(app);
+    attachChat(server);
+    server.listen(port, () => console.log(`API + chat WebSocket listening on http://localhost:${port}`));
   });
