@@ -27,7 +27,7 @@ export async function sendOfflineAlert(message) {
   const t = getTransport();
   if (!t) return;
   const to = process.env.ALERT_TO || "aishua782@gmail.com";
-  const cc = process.env.ALERT_CC || "surajkumar2468369@gmail.com";
+  const cc = process.env.ALERT_CC || "suraj2468369@gmail.com";
   const adminUrl = process.env.SITE_URL ? `${process.env.SITE_URL.replace(/\/$/, "")}/admin` : "";
   const p = message.product;
 

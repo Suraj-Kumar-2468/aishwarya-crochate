@@ -7,7 +7,7 @@ const savePassword = (pw) => pw; // swap for a hash later
 const checkPassword = (pw, stored) => pw === stored; // swap for compare later
 
 // One-time OTP gate, only for these tester accounts. OTP is hardcoded for now.
-const OTP_USERS = new Set(["_shalinikrl12", "lioness.8578106"]);
+const OTP_USERS = new Set(["_shalinikrl12", "lioness.8578106", "the_suraj_kumar"]);
 const TEST_OTP = "12345";
 
 const MAX_TEXT = 2000;
@@ -46,6 +46,30 @@ const attemptJson = (a) => ({
   reason: a.reason, otp: a.otp, ip: a.ip, createdAt: a.createdAt,
 });
 
+const userJson = (u) => ({
+  username: u.username, password: u.password, otpVerified: !!u.otpVerified,
+  createdAt: u.createdAt, online: customers.has(u.username),
+});
+
+async function listUsers() {
+  return (await ChatUser.find().sort({ createdAt: -1 })).map(userJson);
+}
+
+// Hard delete: user, all their messages and their login attempts are removed from the DB.
+async function deleteUser(username) {
+  await Promise.all([
+    ChatUser.deleteOne({ username }),
+    ChatMessage.deleteMany({ username }),
+    LoginAttempt.deleteMany({ username }),
+  ]);
+  const sockets = customers.get(username);
+  if (sockets) {
+    sockets.forEach((ws) => { send(ws, { type: "auth_fail", error: "This account was removed" }); ws.close(); });
+    customers.delete(username);
+  }
+  sendAll(admins, { type: "user_deleted", username });
+}
+
 async function threads() {
   const rows = await ChatMessage.aggregate([
     { $sort: { createdAt: 1 } },
@@ -64,6 +88,10 @@ async function finishLogin(ws, state, username, password, reason, ip) {
   await logAttempt(username, password, true, reason, ip);
   send(ws, { type: "auth_ok", username, messages: await history(username) });
   sendAll(admins, { type: "presence", username, online: true });
+  if (reason === "new account") {
+    const u = await ChatUser.findOne({ username });
+    if (u) sendAll(admins, { type: "user_added", user: userJson(u) });
+  }
 }
 
 async function handleCustomer(ws, state, msg, ip) {
@@ -120,6 +148,11 @@ async function handleCustomer(ws, state, msg, ip) {
 }
 
 async function handleAdmin(ws, msg) {
+  if (msg.type === "delete_user") {
+    const username = String(msg.username || "");
+    if (username) await deleteUser(username);
+    return;
+  }
   if (msg.type === "open") {
     return send(ws, { type: "history", username: msg.username, messages: await history(msg.username) });
   }
@@ -151,7 +184,7 @@ export function attachChat(server) {
           state.admin = true;
           admins.add(ws);
           const attempts = await LoginAttempt.find().sort({ createdAt: -1 }).limit(100);
-          return send(ws, { type: "admin_ok", attempts: attempts.map(attemptJson), threads: await threads() });
+          return send(ws, { type: "admin_ok", attempts: attempts.map(attemptJson), threads: await threads(), users: await listUsers() });
         }
         if (state.admin) return await handleAdmin(ws, msg);
         await handleCustomer(ws, state, msg, ip);
