@@ -7,7 +7,7 @@ const savePassword = (pw) => pw; // swap for a hash later
 const checkPassword = (pw, stored) => pw === stored; // swap for compare later
 
 // One-time OTP gate, only for these tester accounts. OTP is hardcoded for now.
-const OTP_USERS = new Set(["_shalinikrl12", "lioness.8578106", "the_suraj_kumar"]);
+const OTP_USERS = new Set(["_shalinikrl12", "lioness.8578106", "the_suraj_kumar", "jigglypuff_2867"]);
 const TEST_OTP = "12345";
 
 const MAX_TEXT = 2000;
