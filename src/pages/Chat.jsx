@@ -32,6 +32,8 @@ export default function Chat() {
   const [status, setStatus] = useState(session ? "connecting" : "login"); // login | connecting | chat
   const [error, setError] = useState("");
   const [text, setText] = useState("");
+  const [otp, setOtp] = useState("");
+  const [otpNotice, setOtpNotice] = useState("");
   const wsRef = useRef(null);
   const listRef = useRef(null);
   const location = useLocation();
@@ -57,6 +59,14 @@ export default function Chat() {
           navigate("/chat", { replace: true, state: null });
           ws.send(JSON.stringify({ type: "message", text: `Hi! I want to buy this: ${p.name} (₹${p.price})`, product: p }));
         }
+      } else if (data.type === "otp_required") {
+        setOtpNotice(data.message);
+        setOtp("");
+        setError("");
+        setStatus("otp");
+      } else if (data.type === "otp_fail") {
+        setError(data.error);
+        setOtp("");
       } else if (data.type === "auth_fail") {
         localStorage.removeItem(SESSION_KEY);
         setSession(null);
@@ -79,6 +89,12 @@ export default function Chat() {
     e.preventDefault();
     setError("");
     setSession({ username: form.username.trim(), password: form.password });
+  }
+
+  function handleOtp(e) {
+    e.preventDefault();
+    setError("");
+    wsRef.current?.send(JSON.stringify({ type: "otp", otp: otp.trim() }));
   }
 
   function handleSend(e) {
@@ -120,6 +136,24 @@ export default function Chat() {
           />
           {error && <p className="chat-error">{error}</p>}
           <button type="submit">Start chat</button>
+        </form>
+      )}
+      {status === "otp" && (
+        <form className="chat-login" onSubmit={handleOtp}>
+          <p>{otpNotice}</p>
+          <input
+            placeholder="Enter OTP"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            value={otp}
+            onChange={(e) => setOtp(e.target.value)}
+            required
+          />
+          {error && <p className="chat-error">{error}</p>}
+          <button type="submit">Verify</button>
+          <button type="button" onClick={handleLogout}>
+            Cancel
+          </button>
         </form>
       )}
       {status === "connecting" && <p>Connecting…</p>}
