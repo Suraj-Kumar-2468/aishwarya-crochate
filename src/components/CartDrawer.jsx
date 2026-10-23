@@ -3,18 +3,7 @@ import { Link } from "react-router-dom";
 import { useCart, MAX_QTY } from "../context/CartContext.jsx";
 import { optimized } from "../utils/img.js";
 
-const WHATSAPP_NUMBER = "919611662744"; // country code 91 + number, digits only
-
-function whatsappUrl(items, subtotal) {
-  const lines = items.map(
-    (it, i) =>
-      `${i + 1}. ${it.name} x ${it.qty} = ${rupees(it.price * it.qty)}\n   ${window.location.origin}/product/${it.id}`
-  );
-  const text = ["Hi! I'd like to order:", "", ...lines, "", `Subtotal: ${rupees(subtotal)}`].join("\n");
-  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
-}
-
-const rupees = (n) => `₹${n.toLocaleString("en-IN")}`;
+import { rupees, whatsappUrl } from "../utils/whatsapp.js";
 
 export default function CartDrawer() {
   const { items, count, subtotal, setQty, remove, open, setOpen } = useCart();
