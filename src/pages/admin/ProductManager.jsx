@@ -99,8 +99,8 @@ export default function ProductManager() {
     setForm({
       name: product.name,
       category: product.category,
-      price: product.price,
-      mrp: product.mrp || "",
+      price: product.rawPrice ?? product.price,
+      mrp: product.rawMrp || product.mrp || "",
       tag: product.tag || "",
       images: (product.images || []).map((img) => ({ ...img })),
       description: product.description || "",
@@ -188,12 +188,13 @@ export default function ProductManager() {
             </datalist>
           </label>
           <label className="admin-field">
-            Price
+            Price (₹)
             <input type="number" value={form.price} onChange={(e) => setField("price", e.target.value)} required />
           </label>
           <label className="admin-field">
-            MRP (optional, for discount)
+            Second price (optional, for a discount)
             <input type="number" value={form.mrp} onChange={(e) => setField("mrp", e.target.value)} />
+            <span className="admin-hint">Enter both prices in any order. The lower one is what customers pay; the higher one is shown struck through.</span>
           </label>
           <label className="admin-field">
             Tag
@@ -296,7 +297,7 @@ export default function ProductManager() {
               <th>Name</th>
               <th>Category</th>
               <th>Price</th>
-              <th>MRP</th>
+              <th>Second price</th>
               <th>Tag</th>
               <th></th>
             </tr>
@@ -307,8 +308,8 @@ export default function ProductManager() {
                 <td><img src={p.images?.[0]?.url} alt={p.name} className="admin-product-thumb" /></td>
                 <td>{p.name}</td>
                 <td>{p.category}</td>
-                <td>₹{p.price}</td>
-                <td>{p.mrp ? `₹${p.mrp}` : "—"}</td>
+                <td>₹{p.rawPrice ?? p.price}</td>
+                <td>{p.rawMrp || p.mrp ? `₹${p.rawMrp || p.mrp}` : "—"}</td>
                 <td>{p.tag || "—"}</td>
                 <td className="admin-product-actions">
                   <button type="button" onClick={() => startEdit(p)}>Edit</button>

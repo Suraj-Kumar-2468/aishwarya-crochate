@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useCart } from "../context/CartContext.jsx";
+import { optimized, srcSet } from "../utils/img.js";
 import useReveal from "../hooks/useReveal.js";
 import useParallax from "../hooks/useParallax.js";
 
@@ -9,6 +11,7 @@ export default function ProductCard({ product, position = 0 }) {
   const [ref, visible] = useReveal();
   const parallaxRef = useParallax(PARALLAX_SPEEDS[position % PARALLAX_SPEEDS.length], 16);
   const [index, setIndex] = useState(0);
+  const { add } = useCart();
 
   const images = product.images?.length ? product.images : [];
   const hasMultiple = images.length > 1;
@@ -34,7 +37,15 @@ export default function ProductCard({ product, position = 0 }) {
         <Link to={`/product/${product.id}`} className="product-image-link">
           {product.tag && <span className={"product-tag tag-" + product.tag.toLowerCase()}>{product.tag}</span>}
           {hasDiscount && <span className="product-discount-badge">{discountPct}% off</span>}
-          <img src={images[index]?.url} alt={product.name} loading="lazy" />
+          <img
+            src={optimized(images[index]?.url, 480)}
+            srcSet={srcSet(images[index]?.url, [320, 480, 720])}
+            sizes="(max-width: 700px) 50vw, (max-width: 1100px) 33vw, 280px"
+            alt={product.name}
+            loading={position < 4 ? "eager" : "lazy"}
+            fetchpriority={position < 2 ? "high" : "auto"}
+            decoding="async"
+          />
         </Link>
         {hasMultiple && (
           <>
@@ -51,13 +62,9 @@ export default function ProductCard({ product, position = 0 }) {
             </div>
           </>
         )}
-        <Link
-          className="buy-now-btn"
-          to="/chat"
-          state={{ product: { id: product.id, name: product.name, price: product.price, image: images[0]?.url || "" } }}
-        >
-          Buy Now
-        </Link>
+        <button type="button" className="buy-now-btn" onClick={() => add(product)}>
+          Add to cart
+        </button>
       </div>
       <Link to={`/product/${product.id}`} className="product-card-link">
         <div className="product-info">

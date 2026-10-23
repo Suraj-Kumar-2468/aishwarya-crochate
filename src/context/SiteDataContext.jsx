@@ -1,23 +1,40 @@
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { applyPricing } from "../utils/pricing.js";
 import { fetchContent, fetchProducts } from "../api.js";
 
 const SiteDataContext = createContext(null);
+const CACHE_KEY = "site_data_v1";
+
+function readCache() {
+  try {
+    const c = JSON.parse(localStorage.getItem(CACHE_KEY));
+    return c?.content && Array.isArray(c.products) ? { ...c, products: c.products.map(applyPricing) } : null;
+  } catch {
+    return null;
+  }
+}
 
 export function SiteDataProvider({ children }) {
-  const [content, setContent] = useState(null);
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // Show last-seen data immediately and refresh in the background, so a slow or sleeping API doesn't blank the page.
+  const [cached] = useState(readCache);
+  const [content, setContent] = useState(cached?.content || null);
+  const [products, setProducts] = useState(cached?.products || []);
+  const [loading, setLoading] = useState(!cached);
   const [error, setError] = useState(null);
 
   const refetch = useCallback(async () => {
-    setLoading(true);
     setError(null);
     try {
       const [contentData, productsData] = await Promise.all([fetchContent(), fetchProducts()]);
       setContent(contentData);
-      setProducts(productsData);
+      setProducts(productsData.map(applyPricing));
+      try {
+        localStorage.setItem(CACHE_KEY, JSON.stringify({ content: contentData, products: productsData }));
+      } catch {
+        /* cache is optional */
+      }
     } catch (err) {
-      setError(err.message || "Failed to load site data");
+      if (!readCache()) setError(err.message || "Failed to load site data");
     } finally {
       setLoading(false);
     }

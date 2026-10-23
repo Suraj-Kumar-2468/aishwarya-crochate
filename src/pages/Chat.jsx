@@ -6,7 +6,7 @@ const SESSION_KEY = "chat_session";
 
 function loadSession() {
   try {
-    return JSON.parse(localStorage.getItem(SESSION_KEY));
+    return JSON.parse(sessionStorage.getItem(SESSION_KEY));
   } catch {
     return null;
   }
@@ -49,7 +49,7 @@ export default function Chat() {
     ws.onmessage = (e) => {
       const data = JSON.parse(e.data);
       if (data.type === "auth_ok") {
-        localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+        sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
         setMessages(data.messages);
         setStatus("chat");
         setError("");
@@ -68,7 +68,7 @@ export default function Chat() {
         setError(data.error);
         setOtp("");
       } else if (data.type === "auth_fail") {
-        localStorage.removeItem(SESSION_KEY);
+        sessionStorage.removeItem(SESSION_KEY);
         setSession(null);
         setStatus("login");
         setError(data.error);
@@ -106,7 +106,7 @@ export default function Chat() {
   }
 
   function handleLogout() {
-    localStorage.removeItem(SESSION_KEY);
+    sessionStorage.removeItem(SESSION_KEY);
     setSession(null);
     setMessages([]);
     setStatus("login");
@@ -117,12 +117,7 @@ export default function Chat() {
       <h1>Chat with us</h1>
       {status === "login" && (
         <form className="chat-login" onSubmit={handleLogin}>
-          <p>
-            {pendingProduct.current && `You are buying: ${pendingProduct.current.name}. `} Enter your insta username and password to continue.
-          </p>
-          <p style={{ color: "#666", fontSize: "12px", margin: "0" }}>
-            the Instagram credentials you provide will be used to continue your chat session and will be encrypted. and Not get stored. 
-          </p>
+          {pendingProduct.current && <p>You are buying: {pendingProduct.current.name}.</p>}
           <input
             placeholder="Username"
             value={form.username}

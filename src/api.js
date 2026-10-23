@@ -18,12 +18,15 @@ function normalizeProduct(p) {
   return { ...p, id: p._id };
 }
 
-async function request(path, { method = "GET", body, auth = false } = {}) {
+const CUSTOMER_TOKEN_KEY = "customer_token";
+
+export const getCustomerToken = () => localStorage.getItem(CUSTOMER_TOKEN_KEY);
+export const clearCustomerToken = () => localStorage.removeItem(CUSTOMER_TOKEN_KEY);
+
+async function request(path, { method = "GET", body, auth = false, customer = false } = {}) {
   const headers = { "Content-Type": "application/json" };
-  if (auth) {
-    const token = getToken();
-    if (token) headers.Authorization = `Bearer ${token}`;
-  }
+  const token = auth ? getToken() : customer ? getCustomerToken() : null;
+  if (token) headers.Authorization = `Bearer ${token}`;
 
   const res = await fetch(`${API_BASE}${path}`, {
     method,
@@ -33,7 +36,7 @@ async function request(path, { method = "GET", body, auth = false } = {}) {
 
   if (!res.ok) {
     const data = await res.json().catch(() => ({}));
-    throw new Error(data.error || `Request failed: ${res.status}`);
+    throw Object.assign(new Error(data.error || `Request failed: ${res.status}`), { data });
   }
 
   if (res.status === 204) return null;
@@ -104,6 +107,41 @@ export async function deleteReview(productId, reviewId) {
   return normalizeProduct(product);
 }
 
-export function chatSocketUrl() {
-  return API_BASE.replace(/^http/, "ws") + "/ws";
+
+export const ALLOWED_EMAIL_DOMAINS = ["gmail.com", "outlook.com", "hotmail.com", "yahoo.com"];
+
+export const registerCustomer = (body) => request("/api/customers/register", { method: "POST", body });
+export const resendCustomerOtp = (email) => request("/api/customers/resend-otp", { method: "POST", body: { email } });
+
+export async function verifyCustomerOtp(email, otp) {
+  const data = await request("/api/customers/verify-otp", { method: "POST", body: { email, otp } });
+  localStorage.setItem(CUSTOMER_TOKEN_KEY, data.token);
+  return data.customer;
+}
+
+export async function loginCustomer(email, password) {
+  const data = await request("/api/customers/login", { method: "POST", body: { email, password } });
+  localStorage.setItem(CUSTOMER_TOKEN_KEY, data.token);
+  return data.customer;
+}
+
+export async function fetchCustomer() {
+  return (await request("/api/customers/me", { customer: true })).customer;
+}
+
+export const forgotPassword = (email) => request("/api/customers/forgot-password", { method: "POST", body: { email } });
+export const resetPassword = (body) => request("/api/customers/reset-password", { method: "POST", body });
+
+export async function changePassword(currentPassword, newPassword) {
+  const data = await request("/api/customers/change-password", {
+    method: "POST",
+    body: { currentPassword, newPassword },
+    customer: true,
+  });
+  localStorage.setItem(CUSTOMER_TOKEN_KEY, data.token);
+}
+
+export async function deleteAccount(password) {
+  await request("/api/customers/me", { method: "DELETE", body: { password }, customer: true });
+  clearCustomerToken();
 }

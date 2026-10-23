@@ -7,7 +7,8 @@ export function requireAdmin(req, res, next) {
   if (!token) return res.status(401).json({ error: "Missing token" });
 
   try {
-    jwt.verify(token, process.env.JWT_SECRET);
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
+    if (payload.role !== "admin") throw new Error("wrong role");
     next();
   } catch {
     res.status(401).json({ error: "Invalid or expired token" });

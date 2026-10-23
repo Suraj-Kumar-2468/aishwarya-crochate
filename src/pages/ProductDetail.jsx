@@ -2,12 +2,15 @@ import { useEffect, useState } from "react";
 import { useParams, Link, Navigate } from "react-router-dom";
 import { useSiteData, getProductById } from "../context/SiteDataContext.jsx";
 import { submitReview } from "../api.js";
+import { useCart } from "../context/CartContext.jsx";
+import { optimized, srcSet } from "../utils/img.js";
 import TrustBadges from "../components/TrustBadges.jsx";
 
 export default function ProductDetail() {
   const { id } = useParams();
   const { content, products, loading, refetch } = useSiteData();
   const [index, setIndex] = useState(0);
+  const { add } = useCart();
   const [reviewForm, setReviewForm] = useState({ name: "", rating: 5, text: "" });
   const [reviewMessage, setReviewMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -71,7 +74,15 @@ export default function ProductDetail() {
       <div className="product-detail">
         <div className="product-detail-gallery">
           <div className="product-detail-image-wrap">
-            <img src={images[index]?.url} alt={product.name} className="product-detail-image" />
+            <img
+              src={optimized(images[index]?.url, 900)}
+              srcSet={srcSet(images[index]?.url, [480, 720, 1080])}
+              sizes="(max-width: 800px) 100vw, 540px"
+              alt={product.name}
+              className="product-detail-image"
+              fetchpriority="high"
+              decoding="async"
+            />
             {hasMultiple && (
               <>
                 <button type="button" className="image-nav image-nav-prev" onClick={prev} aria-label="Previous image">
@@ -92,7 +103,7 @@ export default function ProductDetail() {
                   className={"product-detail-thumb" + (i === index ? " active" : "")}
                   onClick={() => setIndex(i)}
                 >
-                  <img src={img.url} alt={`${product.name} ${i + 1}`} />
+                  <img src={optimized(img.url, 160)} alt={`${product.name} ${i + 1}`} width="80" height="80" loading="lazy" decoding="async" />
                 </button>
               ))}
             </div>
@@ -120,13 +131,9 @@ export default function ProductDetail() {
             </ul>
           )}
 
-          <Link
-            className="buy-now-btn buy-now-btn-large"
-            to="/chat"
-            state={{ product: { id: product.id, name: product.name, price: product.price, image: images[0]?.url || "" } }}
-          >
-            Buy Now
-          </Link>
+          <button type="button" className="buy-now-btn buy-now-btn-large" onClick={() => add(product)}>
+            Add to cart
+          </button>
 
           {product.badges?.length > 0 && (
             <div className="product-badges">

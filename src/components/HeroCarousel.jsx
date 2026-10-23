@@ -84,7 +84,14 @@ export default function HeroCarousel({ slides, tagline, subtitle, buttonText }) 
               {slides.map((s, i) => (
                 <picture key={i} className={"hero-frame-slide" + (i === index ? " active" : "")}>
                   {s.mobileImage && <source media="(max-width: 700px)" srcSet={s.mobileImage} />}
-                  <img src={s.desktopImage} alt="" className="hero-frame-img" />
+                  <img
+                    src={s.desktopImage}
+                    alt=""
+                    className="hero-frame-img"
+                    loading={i === 0 ? "eager" : "lazy"}
+                    fetchpriority={i === 0 ? "high" : "auto"}
+                    decoding="async"
+                  />
                 </picture>
               ))}
 

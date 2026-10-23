@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useSiteData } from "../context/SiteDataContext.jsx";
 
 export default function Footer() {
@@ -9,6 +10,10 @@ export default function Footer() {
       <div className="footer-socials">
         <a href={content.instagramUrl} target="_blank" rel="noopener noreferrer">Instagram</a>
         <a href={content.facebookUrl} target="_blank" rel="noopener noreferrer">Facebook</a>
+      </div>
+      <div className="footer-socials">
+        <Link to="/privacy">Privacy Policy</Link>
+        <Link to="/terms">Terms of Use</Link>
       </div>
       <p>&copy; 2026 {content.businessName}. {content.footerText}</p>
     </footer>

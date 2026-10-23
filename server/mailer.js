@@ -6,7 +6,7 @@ function getTransport() {
   if (transport !== undefined) return transport;
   const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS } = process.env;
   if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS) {
-    console.warn("SMTP_HOST/SMTP_USER/SMTP_PASS not set — offline chat alert emails are disabled.");
+    console.warn("SMTP_HOST/SMTP_USER/SMTP_PASS not set — emails are disabled, so OTP emails will not be delivered.");
     transport = null;
     return transport;
   }
@@ -22,39 +22,44 @@ function getTransport() {
 
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
-// Fire-and-forget: never throws, so a mail failure cannot break chat.
-export async function sendOfflineAlert(message) {
+const SHOP = () => process.env.SHOP_NAME || "Aishwarya Crochets";
+
+async function deliver({ to, subject, text, html }) {
   const t = getTransport();
-  if (!t) return;
-  const to = process.env.ALERT_TO || "aishua782@gmail.com";
-  const cc = process.env.ALERT_CC || "suraj2468369@gmail.com";
-  const adminUrl = process.env.SITE_URL ? `${process.env.SITE_URL.replace(/\/$/, "")}/admin` : "";
-  const p = message.product;
-
-  const text = [
-    `New chat message from "${message.username}" while you were offline.`,
-    "",
-    message.text,
-    p ? `\nProduct: ${p.name} (₹${p.price})` : "",
-    adminUrl ? `\nReply in the admin Chat tab: ${adminUrl}` : "",
-  ].join("\n");
-
-  const html =
-    `<p>New chat message from <strong>${esc(message.username)}</strong> while you were offline.</p>` +
-    `<blockquote>${esc(message.text)}</blockquote>` +
-    (p ? `<p>Product: <strong>${esc(p.name)}</strong> (₹${esc(p.price)})</p>${p.image ? `<img src="${esc(p.image)}" alt="" width="120">` : ""}` : "") +
-    (adminUrl ? `<p><a href="${esc(adminUrl)}">Open admin Chat tab</a></p>` : "");
-
+  if (!t) return; // Never log email contents or recipients: they carry OTPs and personal data.
   try {
-    await t.sendMail({
-      from: process.env.MAIL_FROM || process.env.SMTP_USER,
-      to,
-      cc,
-      subject: `New chat message from ${message.username}`,
-      text,
-      html,
-    });
+    await t.sendMail({ from: process.env.MAIL_FROM || process.env.SMTP_USER, to, subject, text, html });
   } catch (err) {
-    console.error("Failed to send offline alert email:", err.message);
+    console.error("Email delivery failed:", err.code || err.name);
   }
+}
+
+export function sendOtpEmail(to, name, otp, purpose = "verify") {
+  const what = purpose === "reset" ? "reset your password" : "verify your email";
+  const ignore = purpose === "reset"
+    ? "If you did not request this, you can ignore this email. Your password has not changed."
+    : "If you did not sign up, you can ignore this email.";
+  return deliver({
+    to,
+    subject: `${otp} is your ${SHOP()} code`,
+    text: `Hi ${name},
+
+Your code to ${what} is ${otp}. It expires in 10 minutes. Never share it with anyone.
+
+${ignore}`,
+    html: `<p>Hi ${esc(name)},</p><p>Your code to ${what}:</p><p><strong style="font-size:24px;letter-spacing:6px">${esc(otp)}</strong></p><p>It expires in 10 minutes. Never share it with anyone.</p><p>${ignore}</p>`,
+  });
+}
+
+export function sendSecurityNoticeEmail(to, name, message) {
+  return deliver({
+    to,
+    subject: `Security notice from ${SHOP()}`,
+    text: `Hi ${name},
+
+${message}
+
+If this was not you, contact us immediately.`,
+    html: `<p>Hi ${esc(name)},</p><p>${esc(message)}</p><p>If this was not you, contact us immediately.</p>`,
+  });
 }

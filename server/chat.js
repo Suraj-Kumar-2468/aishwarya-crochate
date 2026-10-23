@@ -178,7 +178,9 @@ export function attachChat(server) {
       try { msg = JSON.parse(raw.toString()); } catch { return; }
       try {
         if (msg.type === "admin_auth") {
-          try { jwt.verify(msg.token, process.env.JWT_SECRET); } catch {
+          try {
+            if (jwt.verify(msg.token, process.env.JWT_SECRET).role !== "admin") throw new Error("wrong role");
+          } catch {
             return send(ws, { type: "admin_fail", error: "Invalid token" });
           }
           state.admin = true;

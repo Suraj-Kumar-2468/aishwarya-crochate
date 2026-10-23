@@ -1,4 +1,5 @@
 import { useSiteData } from "../context/SiteDataContext.jsx";
+import { optimized } from "../utils/img.js";
 import useParallax from "../hooks/useParallax.js";
 
 const SPEEDS = [0.04, -0.05, 0.06, -0.03, 0.05, -0.04];
@@ -13,7 +14,7 @@ function InstagramTile({ product, instagramUrl, position }) {
       className="instagram-tile"
       ref={ref}
     >
-      <img src={product.images?.[0]?.url} alt={product.name} loading="lazy" />
+      <img src={optimized(product.images?.[0]?.url, 480)} alt={product.name} loading="lazy" decoding="async" />
     </a>
   );
 }
